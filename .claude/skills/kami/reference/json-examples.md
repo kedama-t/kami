@@ -1,57 +1,6 @@
-# kami CLI リファレンス詳細
+# JSON出力例
 
-必要な時だけ参照すること。基本的な使い方は SKILL.md を参照。
-
-## Frontmatter仕様
-
-```yaml
----
-title: "記事タイトル"
-tags: [tag1, tag2]
-created: 2026-02-15T10:30:00+09:00  # ISO 8601
-updated: 2026-02-15T10:30:00+09:00
-template: note        # optional
-aliases: [alias1]     # optional
-draft: false          # optional
----
-```
-
-## テンプレート変数
-
-| 変数 | 展開値 |
-|------|--------|
-| `{{title}}` | create時のタイトル |
-| `{{date}}` | YYYY-MM-DD |
-| `{{datetime}}` | ISO 8601 |
-| `{{folder}}` | 保存先フォルダ |
-
-## Slug解決
-
-slugには以下のいずれかを指定可能:
-- ファイル名: `typescript-tips`
-- フォルダ付き: `notes/typescript-tips`
-- タイトル完全一致: `"TypeScriptの便利なテクニック"`
-- エイリアス: aliases フィールドの値
-
-自動生成: タイトルそのまま使用（日本語OK）。FS禁止文字は `-` に置換。重複時は `-1`, `-2` を付与。
-
-## エラーコード
-
-| code | 説明 |
-|------|------|
-| `ARTICLE_NOT_FOUND` | 記事が存在しない |
-| `AMBIGUOUS_SLUG` | 複数候補あり（`candidates` で一覧取得可） |
-| `ARTICLE_ALREADY_EXISTS` | 同名記事が既に存在 |
-| `TEMPLATE_NOT_FOUND` | テンプレートが存在しない |
-| `SCOPE_NOT_FOUND` | スコープ未初期化 |
-| `INVALID_FRONTMATTER` | frontmatterパース失敗 |
-| `HOOK_BLOCKED` | pre-hookが操作を拒否 |
-| `VALIDATION_ERROR` | バリデーションエラー |
-| `IO_ERROR` | ファイルI/Oエラー |
-
-## 主要コマンドのJSON出力例
-
-### create
+## create
 
 ```json
 {
@@ -68,7 +17,7 @@ slugには以下のいずれかを指定可能:
 }
 ```
 
-### read (--json)
+## read
 
 ```json
 {
@@ -95,7 +44,7 @@ slugには以下のいずれかを指定可能:
 }
 ```
 
-### list (--json)
+## list
 
 ```json
 {
@@ -120,7 +69,7 @@ slugには以下のいずれかを指定可能:
 }
 ```
 
-### search (--json)
+## search
 
 ```json
 {
@@ -143,7 +92,7 @@ slugには以下のいずれかを指定可能:
 }
 ```
 
-### edit (--json)
+## edit
 
 ```json
 {
@@ -165,7 +114,7 @@ slugには以下のいずれかを指定可能:
 }
 ```
 
-### delete (--force --json)
+## delete
 
 ```json
 {
@@ -180,35 +129,4 @@ slugには以下のいずれかを指定可能:
     ]
   }
 }
-```
-
-## Hook設定 (hooks.json)
-
-```json
-{
-  "hooks": {
-    "article:post-create": [
-      {
-        "matcher": "daily/.*",
-        "hooks": [{ "type": "command", "command": "git add ${file_path}", "timeout": 30 }]
-      }
-    ]
-  }
-}
-```
-
-イベント: `article:pre-create`, `article:post-create`, `article:pre-update`, `article:post-update`, `article:pre-delete`, `article:post-delete`, `build:pre`, `build:post`
-
-変数: `${slug}`, `${title}`, `${file_path}`, `${scope}`
-
-## ディレクトリ構造
-
-```
-~/.kami/                    ./.kami/
-  config.json                config.json
-  hooks.json                 hooks.json
-  templates/                 templates/
-  vault/                     vault/
-  index.json                 index.json
-  links.json                 links.json
 ```
