@@ -20,7 +20,13 @@ import {
   getScopePaths,
   getScopeRoot,
   ensureGlobalScope,
+  getGlobalRoot,
 } from "./scope.ts";
+import {
+  readTemplate,
+  expandTemplate,
+  buildTemplateVariables,
+} from "./template.ts";
 
 const storage = new LocalStorage();
 
@@ -191,7 +197,27 @@ export async function createArticle(
   if (options.body) {
     body = options.body;
   } else {
-    body = `# ${title}`;
+    // Try to load and expand template
+    const templateName = options.template ?? "note";
+    const scopeRoots = [
+      ...(localRoot ? [{ scope: "local" as const, root: localRoot }] : []),
+      { scope: "global" as const, root: getGlobalRoot() },
+    ];
+    const tpl = await readTemplate(templateName, scopeRoots);
+    if (tpl) {
+      const vars = buildTemplateVariables(title, folder);
+      const expanded = expandTemplate(tpl.content, vars);
+      // Parse expanded template: extract body (after frontmatter)
+      try {
+        const { body: tplBody } = parseFrontmatter(expanded);
+        body = tplBody;
+      } catch {
+        // Template has no frontmatter, use as-is
+        body = expanded;
+      }
+    } else {
+      body = `# ${title}`;
+    }
   }
 
   // Write file

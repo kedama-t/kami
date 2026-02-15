@@ -5,6 +5,7 @@ import { getScopeRoot } from "../../core/scope.ts";
 import type { Scope } from "../../types/scope.ts";
 import { jsonSuccess, handleError } from "../helpers/output.ts";
 import { readBody } from "../helpers/input.ts";
+import { runPostHook } from "../helpers/hooks.ts";
 
 export default defineCommand({
   meta: {
@@ -93,6 +94,9 @@ export default defineCommand({
       // Update index
       const root = await getScopeRoot(result.scope);
       await upsertInIndex(root, result.meta);
+
+      // Run post-create hook
+      await runPostHook("article:post-create", result.scope, result.meta);
 
       if (args.quiet) return;
 

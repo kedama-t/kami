@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { join, basename } from "node:path";
 import type { LinkGraph, LinkEntry } from "../types/index.ts";
 import type { Scope } from "../types/scope.ts";
 import { LocalStorage } from "../storage/local.ts";
@@ -152,6 +152,55 @@ function removeBacklinksFrom(
       delete graph.backlinks[targetSlug];
     }
   }
+}
+
+/** Rebuild link graph from scratch by scanning all articles */
+export async function rebuildLinkGraph(
+  scopeRoot: string,
+  scope: Scope,
+): Promise<{ linkCount: number }> {
+  const paths = getScopePaths(scopeRoot);
+  const files = await storage.listFiles(paths.vault, "**/*.md");
+
+  const graph: LinkGraph = { forward: {}, backlinks: {} };
+  let linkCount = 0;
+
+  for (const filePath of files) {
+    try {
+      const content = await storage.readFile(filePath);
+      const slug = basename(filePath, ".md");
+      const links = parseWikiLinks(content);
+
+      if (links.length === 0) continue;
+
+      const entries: LinkEntry[] = links.map((link) => ({
+        slug: link.slug,
+        scope: link.scope,
+        displayText: link.displayText ?? undefined,
+      }));
+
+      graph.forward[slug] = entries;
+      linkCount += entries.length;
+
+      // Build backlinks
+      for (const entry of entries) {
+        if (!graph.backlinks[entry.slug]) {
+          graph.backlinks[entry.slug] = [];
+        }
+        const existing = graph.backlinks[entry.slug]!.find(
+          (b) => b.slug === slug && b.scope === scope,
+        );
+        if (!existing) {
+          graph.backlinks[entry.slug]!.push({ slug, scope });
+        }
+      }
+    } catch {
+      // Skip files that can't be read
+    }
+  }
+
+  await saveLinkGraph(scopeRoot, graph);
+  return { linkCount };
 }
 
 /** Check for cross-scope link warnings (global -> local is discouraged) */
