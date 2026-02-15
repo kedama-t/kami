@@ -1,4 +1,4 @@
-# JSON出力例
+# JSON Output Examples
 
 ## create
 
@@ -7,7 +7,7 @@
   "ok": true,
   "data": {
     "slug": "typescript-tips",
-    "title": "TypeScriptの便利なテクニック",
+    "title": "TypeScript Tips",
     "scope": "local",
     "folder": "notes",
     "file_path": "/path/.kami/vault/notes/typescript-tips.md",
@@ -24,12 +24,12 @@
   "ok": true,
   "data": {
     "slug": "typescript-tips",
-    "title": "TypeScriptの便利なテクニック",
+    "title": "TypeScript Tips",
     "scope": "local",
     "folder": "notes",
     "file_path": "/path/.kami/vault/notes/typescript-tips.md",
     "frontmatter": {
-      "title": "TypeScriptの便利なテクニック",
+      "title": "TypeScript Tips",
       "tags": ["typescript"],
       "created": "2026-02-15T10:30:00+09:00",
       "updated": "2026-02-15T10:30:00+09:00",
@@ -37,9 +37,9 @@
       "aliases": [],
       "draft": false
     },
-    "body": "# TypeScriptの便利なテクニック\n\n...",
+    "body": "# TypeScript Tips\n\n...",
     "links": ["generics-guide"],
-    "backlinks": [{ "slug": "web-dev", "scope": "local", "title": "Web開発メモ" }]
+    "backlinks": [{ "slug": "web-dev", "scope": "local", "title": "Web Dev Notes" }]
   }
 }
 ```
@@ -53,7 +53,7 @@
     "articles": [
       {
         "slug": "architecture-overview",
-        "title": "アーキテクチャ概要",
+        "title": "Architecture Overview",
         "scope": "local",
         "folder": "design",
         "tags": ["architecture"],
@@ -78,7 +78,7 @@
     "results": [
       {
         "slug": "typescript-tips",
-        "title": "TypeScriptの便利なテクニック",
+        "title": "TypeScript Tips",
         "scope": "local",
         "folder": "notes",
         "score": 12.4,
@@ -103,7 +103,7 @@
     "scope": "local",
     "file_path": "/path/.kami/vault/notes/typescript-tips.md",
     "changes": {
-      "title": { "from": "旧タイトル", "to": "TypeScript Tips" },
+      "title": { "from": "Old Title", "to": "TypeScript Tips" },
       "tags_added": ["advanced"],
       "tags_removed": [],
       "body_changed": false,
@@ -121,7 +121,7 @@
   "ok": true,
   "data": {
     "slug": "typescript-tips",
-    "title": "TypeScriptの便利なテクニック",
+    "title": "TypeScript Tips",
     "scope": "local",
     "file_path": "/path/.kami/vault/notes/typescript-tips.md",
     "dangling_backlinks": [

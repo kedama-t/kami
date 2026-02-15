@@ -1,10 +1,10 @@
-# 記事フォーマット
+# Article Format
 
 ## Frontmatter
 
 ```yaml
 ---
-title: "記事タイトル"
+title: "Article Title"
 tags: [tag1, tag2]
 created: 2026-02-15T10:30:00+09:00
 updated: 2026-02-15T10:30:00+09:00
@@ -14,26 +14,26 @@ draft: false          # optional
 ---
 ```
 
-## Slug解決
+## Slug resolution
 
-slugには以下のいずれかを指定可能:
-- ファイル名: `typescript-tips`
-- フォルダ付き: `notes/typescript-tips`
-- タイトル完全一致: `"TypeScriptの便利なテクニック"`
-- エイリアス: aliases フィールドの値
+A slug can be any of:
+- Filename: `typescript-tips`
+- Folder-qualified: `notes/typescript-tips`
+- Exact title match: `"TypeScript Tips"`
+- Alias: any value in the `aliases` field
 
-自動生成ルール: タイトルそのまま使用（日本語OK）。FS禁止文字(`/ \ : * ? " < > |`)は `-` に置換。重複時は `-1`, `-2` を付与。
+Auto-generation: uses title as-is (Japanese OK). Filesystem-unsafe chars (`/ \ : * ? " < > |`) are replaced with `-`. Duplicates get `-1`, `-2` suffix.
 
-## テンプレート変数
+## Template variables
 
-| 変数 | 展開値 |
-|------|--------|
-| `{{title}}` | create時のタイトル |
+| Variable | Expands to |
+|----------|------------|
+| `{{title}}` | Title from `kami create` |
 | `{{date}}` | YYYY-MM-DD |
 | `{{datetime}}` | ISO 8601 |
-| `{{folder}}` | 保存先フォルダ |
+| `{{folder}}` | Target folder |
 
-## ディレクトリ構造
+## Directory structure
 
 ```
 ~/.kami/          (global)     ./.kami/          (local)
@@ -45,7 +45,7 @@ slugには以下のいずれかを指定可能:
   links.json                     links.json
 ```
 
-## Hook設定 (hooks.json)
+## Hooks (hooks.json)
 
 ```json
 {
@@ -60,6 +60,6 @@ slugには以下のいずれかを指定可能:
 }
 ```
 
-イベント: `article:pre-create`, `article:post-create`, `article:pre-update`, `article:post-update`, `article:pre-delete`, `article:post-delete`, `build:pre`, `build:post`
+Events: `article:pre-create`, `article:post-create`, `article:pre-update`, `article:post-update`, `article:pre-delete`, `article:post-delete`, `build:pre`, `build:post`
 
-変数: `${slug}`, `${title}`, `${file_path}`, `${scope}`
+Variables: `${slug}`, `${title}`, `${file_path}`, `${scope}`

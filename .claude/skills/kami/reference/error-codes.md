@@ -1,30 +1,30 @@
-# エラーコード
+# Error Codes
 
-## 終了コード
+## Exit codes
 
-| コード | 意味 |
-|--------|------|
-| 0 | 成功 |
-| 1 | 一般エラー（不正な引数、ファイルI/Oエラー等） |
-| 2 | 記事が見つからない |
-| 3 | slugが曖昧（複数候補あり） |
-| 4 | Hookによるブロック（pre-hookが操作を拒否） |
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | General error (invalid args, I/O error, etc.) |
+| 2 | Article not found |
+| 3 | Ambiguous slug (multiple candidates) |
+| 4 | Hook blocked (pre-hook rejected operation) |
 
-## JSONエラーコード
+## JSON error codes
 
-| code | 説明 |
-|------|------|
-| `ARTICLE_NOT_FOUND` | 記事が存在しない |
-| `AMBIGUOUS_SLUG` | 複数候補あり。`error.candidates` に候補リスト |
-| `ARTICLE_ALREADY_EXISTS` | 同名記事が既に存在 |
-| `TEMPLATE_NOT_FOUND` | テンプレートが存在しない |
-| `SCOPE_NOT_FOUND` | スコープ未初期化 |
-| `INVALID_FRONTMATTER` | frontmatterパース失敗 |
-| `HOOK_BLOCKED` | pre-hookが操作を拒否 |
-| `VALIDATION_ERROR` | バリデーションエラー |
-| `IO_ERROR` | ファイルI/Oエラー |
+| code | Description |
+|------|-------------|
+| `ARTICLE_NOT_FOUND` | Article does not exist |
+| `AMBIGUOUS_SLUG` | Multiple candidates. `error.candidates` contains the list |
+| `ARTICLE_ALREADY_EXISTS` | Article with same slug already exists |
+| `TEMPLATE_NOT_FOUND` | Template does not exist |
+| `SCOPE_NOT_FOUND` | Scope not initialized |
+| `INVALID_FRONTMATTER` | Frontmatter parse failure |
+| `HOOK_BLOCKED` | Pre-hook rejected operation |
+| `VALIDATION_ERROR` | Input validation error |
+| `IO_ERROR` | File I/O error |
 
-## エラーJSON構造
+## Error JSON structure
 
 ```json
 {
