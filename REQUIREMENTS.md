@@ -20,10 +20,11 @@
 |------|------|
 | 言語 | TypeScript |
 | ランタイム / パッケージマネージャ / テストランナー | Bun |
-| CLIフレームワーク | 未定（後述） |
+| CLIフレームワーク | citty (UnJS) |
 | APIサーバー | Hono |
 | フロントエンド（静的レンダリング） | React (ReactDOMServer) |
 | Markdownパーサー | unified / remark / rehype |
+| 全文検索 | MiniSearch + BudouX（日本語トークナイザ） |
 | データ形式 | Markdown + YAML frontmatter |
 | ストレージ | ローカルファイルシステム |
 
@@ -42,8 +43,8 @@ kamiは**グローバルスコープ**と**ローカルスコープ**の2階層�
 
 ```
 ~/.kami/                          # グローバルスコープ
-  config.toml                     # グローバル設定
-  hooks.toml                      # グローバルHook設定
+  config.json                     # グローバル設定
+  hooks.json                      # グローバルHook設定
   templates/                      # グローバルテンプレート
     note.md
     daily.md
@@ -58,8 +59,8 @@ kamiは**グローバルスコープ**と**ローカルスコープ**の2階層�
   links.json                      # グローバルリンクグラフ
 
 ./.kami/                          # ローカルスコープ（プロジェクトルート）
-  config.toml                     # ローカル設定（グローバルをオーバーライド）
-  hooks.toml                      # ローカルHook設定
+  config.json                     # ローカル設定（グローバルをオーバーライド）
+  hooks.json                      # ローカルHook設定
   templates/                      # ローカルテンプレート
     adr.md
   vault/                          # ローカル記事
@@ -271,59 +272,177 @@ slug（記事の識別子）は以下のいずれかで指定可能:
 | `build:pre` | ビルド前 | 前処理 |
 | `build:post` | ビルド後 | デプロイ連携、通知 |
 
-### 4.3 設定
+### 4.3 設定フォーマット
 
-`hooks.toml` で設定する。グローバル（`~/.kami/hooks.toml`）とローカル（`./.kami/hooks.toml`）の両方を読み込み、同一イベントに対しては**両方実行**する（ローカル → グローバルの順）。
+Claude Codeのhooks設定と同じスキーマ構造を採用する。`hooks.json` で設定し、グローバル（`~/.kami/hooks.json`）とローカル（`./.kami/hooks.json`）の両方を読み込む。同一イベントに対しては**両方実行**する（ローカル → グローバルの順）。
 
-```toml
-[hooks."article:post-create"]
-commands = [
-  "kami build --slug {{slug}}",
-  "git add {{file_path}}",
-]
+#### スキーマ構造
 
-[hooks."article:post-update"]
-commands = [
-  "kami build --slug {{slug}}",
-  "git add {{file_path}} && git commit -m 'update: {{title}}'",
-]
-
-[hooks."article:post-delete"]
-commands = [
-  "kami build",
-  "git add -A && git commit -m 'delete: {{slug}}'",
-]
-
-[hooks."build:post"]
-commands = [
-  "echo 'Build completed at {{timestamp}}'",
-]
+```
+イベント名 (例: "article:post-create")
+  └── マッチャーグループ (hookが発火する条件をフィルタ)
+      └── フックハンドラ (実行するコマンド)
 ```
 
-### 4.4 テンプレート変数
+```json
+{
+  "hooks": {
+    "イベント名": [
+      {
+        "matcher": "正規表現パターン（省略可）",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "シェルコマンド",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
-Hook内のコマンドで使用できる変数:
+#### フックハンドラの型
 
-| 変数 | 説明 | 使用可能なイベント |
-|------|------|-------------------|
-| `{{slug}}` | 記事のslug | article:* |
-| `{{title}}` | 記事タイトル | article:* |
-| `{{file_path}}` | ファイルの絶対パス | article:* |
-| `{{folder}}` | フォルダパス | article:* |
-| `{{tags}}` | タグ（カンマ区切り） | article:* |
-| `{{scope}}` | `local` or `global` | article:* |
-| `{{timestamp}}` | ISO 8601タイムスタンプ | all |
-| `{{vault_path}}` | vaultルートの絶対パス | all |
+| フィールド | 必須 | 型 | 説明 |
+|-----------|------|-----|------|
+| `type` | yes | `"command"` | ハンドラの種類（現時点では `command` のみ） |
+| `command` | yes | string | 実行するシェルコマンド |
+| `timeout` | no | number | タイムアウト秒数（デフォルト: 30） |
 
-### 4.5 実行ルール
+#### マッチャー
+
+`matcher` フィールドで、hookが発火する条件を正規表現で絞り込める。
+
+| イベント | マッチ対象 | 例 |
+|----------|-----------|-----|
+| `article:*` | フォルダパス | `"daily/.*"` — dailyフォルダの記事のみ |
+| `build:*` | スコープ | `"local"` — ローカルビルドのみ |
+
+`matcher` を省略した場合、そのイベントのすべての発火に対して実行される。
+
+#### 設定例
+
+```json
+{
+  "hooks": {
+    "article:post-create": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "kami build --slug ${slug}"
+          },
+          {
+            "type": "command",
+            "command": "git add ${file_path}"
+          }
+        ]
+      }
+    ],
+    "article:post-update": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "kami build --slug ${slug}"
+          },
+          {
+            "type": "command",
+            "command": "git add ${file_path} && git commit -m 'update: ${title}'"
+          }
+        ]
+      }
+    ],
+    "article:post-delete": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "kami build"
+          },
+          {
+            "type": "command",
+            "command": "git add -A && git commit -m 'delete: ${slug}'"
+          }
+        ]
+      }
+    ],
+    "build:post": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Build completed at ${timestamp}'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### 4.4 Hook入力（stdin）
+
+コマンド実行時、イベントのコンテキスト情報がJSON形式でstdinに渡される。コマンド文字列内の `${変数名}` も同じ値で展開される。
+
+#### 共通フィールド
+
+```json
+{
+  "event": "article:post-create",
+  "timestamp": "2026-02-15T10:30:00+09:00",
+  "scope": "local",
+  "vault_path": "/home/user/.kami/vault"
+}
+```
+
+#### article:* イベントの追加フィールド
+
+```json
+{
+  "slug": "typescript-tips",
+  "title": "TypeScriptの便利なテクニック",
+  "file_path": "/home/user/project/.kami/vault/notes/typescript-tips.md",
+  "folder": "notes",
+  "tags": ["typescript", "tips"]
+}
+```
+
+### 4.5 Hook出力（stdout）
+
+コマンドがJSONをstdoutに出力した場合、以下のフィールドが解釈される。
+
+```json
+{
+  "continue": true,
+  "message": "ユーザーに表示するメッセージ（省略可）"
+}
+```
+
+| フィールド | 型 | 説明 |
+|-----------|-----|------|
+| `continue` | boolean | `false` の場合、操作を中止する（pre-hookのみ有効） |
+| `message` | string | ユーザーに表示する警告・情報メッセージ |
+
+### 4.6 終了コードの解釈
+
+| 終了コード | 意味 | 動作 |
+|-----------|------|------|
+| `0` | 成功 | stdoutのJSONを解析し、`continue` フィールドを確認 |
+| `2` | ブロックエラー | 操作を中止（pre-hook）。stderrをエラーメッセージとして表示 |
+| その他 | 非ブロックエラー | 警告を表示して続行 |
+
+### 4.7 実行ルール
 
 | ルール | 内容 |
 |--------|------|
-| pre-hookの失敗 | 操作を中止。エラーメッセージを表示 |
+| pre-hookの失敗（終了コード2） | 操作を中止。stderrをエラーメッセージとして表示 |
 | post-hookの失敗 | 警告のみ。本体の操作はロールバックしない |
-| 実行順序 | commands配列の定義順に同期実行。1つが失敗したら後続はスキップ |
+| 実行順序 | hooks配列の定義順に同期実行。1つがブロックしたら後続はスキップ |
 | スコープ間の順序 | ローカルHook → グローバルHookの順に実行 |
-| Hook内からのkami呼び出し | Hookフラグを付与し、再帰的なHook発火を防止する |
+| Hook内からのkami呼び出し | 環境変数 `KAMI_HOOK=1` を付与し、再帰的なHook発火を防止する |
 
 ---
 
@@ -454,23 +573,29 @@ kami/
 
 ## 7. 設定ファイル
 
-グローバル設定（`~/.kami/config.toml`）をベースに、ローカル設定（`./.kami/config.toml`）で上書きする。
+グローバル設定（`~/.kami/config.json`）をベースに、ローカル設定（`./.kami/config.json`）で上書きする。
 
-### 7.1 グローバル設定（`~/.kami/config.toml`）
+### 7.1 グローバル設定（`~/.kami/config.json`）
 
-```toml
-[server]
-port = 3000
-
-[build]
-outDir = "~/.kami/dist"
+```json
+{
+  "server": {
+    "port": 3000
+  },
+  "build": {
+    "outDir": "~/.kami/dist"
+  }
+}
 ```
 
-### 7.2 ローカル設定（`./.kami/config.toml`）
+### 7.2 ローカル設定（`./.kami/config.json`）
 
-```toml
-[build]
-outDir = "./.kami/dist"            # ローカルスコープのビルド出力先
+```json
+{
+  "build": {
+    "outDir": "./.kami/dist"
+  }
+}
 ```
 
 ### 7.3 設定のマージルール
@@ -500,7 +625,7 @@ outDir = "./.kami/dist"            # ローカルスコープのビルド出力�
 ### Phase 3: テンプレート・エクスポート・Hook
 - テンプレート機能（スコープ付き解決）
 - Markdown / HTMLエクスポート
-- Hook機能（hooks.toml、ライフサイクル実行）
+- Hook機能（hooks.json、ライフサイクル実行）
 - CLI: template, export
 
 ### Phase 4: WebUI
@@ -516,11 +641,35 @@ outDir = "./.kami/dist"            # ローカルスコープのビルド出力�
 
 ---
 
-## 9. 未決事項
+## 9. 技術選定の経緯
 
-- [ ] CLIフレームワークの選定（commander / citty / 自前実装）
-- [ ] 全文検索の実装方式（単純な文字列マッチ / MiniSearch / lunr）
-- [ ] 設定ファイルフォーマットの確定（TOML / JSON / YAML）
+### 9.1 CLIフレームワーク → citty
+
+| 候補 | 評価 |
+|------|------|
+| **citty (採用)** | TypeScript-first、ゼロ依存、Bun互換、`defineCommand` による宣言的なAPI、lazy/async subcommands対応。UnJS（Nuxt/Nitro）チームによるメンテナンス |
+| commander | 最大コミュニティだがTS型推論が弱い（`@commander-js/extra-typings` が必要） |
+| yargs | Bunで `$0` が正しく取れない既知バグあり。依存が多い |
+| clipanion | v4がRC止まり。class+decoratorパターンが冗長 |
+| oclif | Bun非公式サポート。依存28個。kamiには過剰 |
+
+### 9.2 全文検索 → MiniSearch + BudouX
+
+| 候補 | 評価 |
+|------|------|
+| **MiniSearch (採用)** | BM25ランキング、ファジー検索、プレフィックス検索。ゼロ依存（~7KB gzip）。`JSON.stringify` / `loadJSON` でインデックス永続化。`add()` / `discard()` / `replace()` でインクリメンタル更新 |
+| **BudouX (採用)** | Google製の日本語テキスト分割ライブラリ（~15KB）。MiniSearchのカスタムトークナイザとして使用 |
+| lunr.js | メンテ放棄（5年以上更新なし）。インクリメンタル更新不可。日本語マルチ言語モードにバグあり |
+| Fuse.js | ファジー検索特化だが全文検索には不向き（線形スキャン、BM25なし） |
+| FlexSearch | 高速だがDXに難（TS型定義不完全、export/import APIの使い勝手が悪い） |
+| Orama | 最も高機能（lindera WASM日本語対応）だが依存が重い。将来的な移行先候補 |
+
+### 9.3 設定ファイルフォーマット
+
+| ファイル | フォーマット | 理由 |
+|----------|-------------|------|
+| `hooks.json` | JSON | Claude Codeのhooks設定と同じスキーマ構造を採用。エコシステムとの親和性 |
+| `config.json` | JSON | hooks.jsonとフォーマットを統一。TOMLパーサーの依存を排除 |
 
 ---
 
