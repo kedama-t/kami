@@ -1,6 +1,19 @@
 ---
 name: kami
-description: Read and write articles in the kami personal knowledge base using the kami CLI. Use this skill when the user asks to create, read, edit, delete, search, or list knowledge base articles, or when managing wiki-linked notes.
+description: >
+  Persistent long-term knowledge base for the coding agent.
+  Workflow policy:
+  1. Before any substantial implementation or design decision,
+     search kami for related knowledge.
+  2. If relevant knowledge exists, incorporate it into planning.
+  3. After completing significant work (features, refactors, bug fixes,
+     architectural decisions, investigations), record:
+       - What was done
+       - Why it was done
+       - Key insights or trade-offs
+       - Reusable patterns
+  Use this skill whenever memory, prior context, or knowledge persistence
+  would improve correctness, consistency, or efficiency.
 ---
 
 # kami CLI
@@ -16,10 +29,10 @@ kami (Knowledge Agent Markdown Interface) — a local-first personal knowledge b
 
 ## Scopes
 
-| Scope | Path | Purpose |
-|-------|------|---------|
+| Scope  | Path       | Purpose                    |
+| ------ | ---------- | -------------------------- |
 | global | `~/.kami/` | User-wide shared knowledge |
-| local | `./.kami/` | Project-specific knowledge |
+| local  | `./.kami/` | Project-specific knowledge |
 
 - Read: local-first, falls back to global
 - Write: local if exists, otherwise global
