@@ -10,6 +10,7 @@ import searchCmd from "./commands/search.ts";
 import links from "./commands/links.ts";
 import backlinks from "./commands/backlinks.ts";
 import template from "./commands/template.ts";
+import exportCmd from "./commands/export.ts";
 
 const main = defineCommand({
   meta: {
@@ -29,6 +30,7 @@ const main = defineCommand({
     links,
     backlinks,
     template,
+    export: exportCmd,
   },
 });
 
