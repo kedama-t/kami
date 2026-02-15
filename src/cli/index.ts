@@ -9,6 +9,7 @@ import list from "./commands/list.ts";
 import searchCmd from "./commands/search.ts";
 import links from "./commands/links.ts";
 import backlinks from "./commands/backlinks.ts";
+import template from "./commands/template.ts";
 
 const main = defineCommand({
   meta: {
@@ -27,6 +28,7 @@ const main = defineCommand({
     search: searchCmd,
     links,
     backlinks,
+    template,
   },
 });
 
