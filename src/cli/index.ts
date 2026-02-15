@@ -6,6 +6,9 @@ import read from "./commands/read.ts";
 import edit from "./commands/edit.ts";
 import del from "./commands/delete.ts";
 import list from "./commands/list.ts";
+import searchCmd from "./commands/search.ts";
+import links from "./commands/links.ts";
+import backlinks from "./commands/backlinks.ts";
 
 const main = defineCommand({
   meta: {
@@ -21,6 +24,9 @@ const main = defineCommand({
     edit,
     delete: del,
     list,
+    search: searchCmd,
+    links,
+    backlinks,
   },
 });
 
