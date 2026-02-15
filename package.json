@@ -1,0 +1,32 @@
+{
+  "name": "kami",
+  "version": "0.1.0",
+  "description": "Knowledge Agent Markdown Interface - AI-friendly personal knowledge base",
+  "module": "src/cli/index.ts",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "kami": "src/cli/index.ts"
+  },
+  "scripts": {
+    "dev": "bun run src/cli/index.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "budoux": "^0.7.0",
+    "citty": "^0.2.1",
+    "gray-matter": "^4.0.3",
+    "minisearch": "^7.2.0",
+    "rehype-stringify": "^10.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5"
+  }
+}
