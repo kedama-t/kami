@@ -1,0 +1,52 @@
+{
+  "articles": {
+    "TailwindCSS v4のCSS-first設定とSSRでの注意点": {
+      "slug": "TailwindCSS v4のCSS-first設定とSSRでの注意点",
+      "title": "TailwindCSS v4のCSS-first設定とSSRでの注意点",
+      "folder": "design",
+      "tags": [
+        "ssr"
+      ],
+      "created": "2026-02-15T22:58:21.113Z",
+      "updated": "2026-02-15T22:58:21.113Z",
+      "template": "note",
+      "filePath": "/home/user/kami/.kami/vault/design/TailwindCSS v4のCSS-first設定とSSRでの注意点.md"
+    },
+    "daisyUI v5のセットアップとテーマ設定": {
+      "slug": "daisyUI v5のセットアップとテーマ設定",
+      "title": "daisyUI v5のセットアップとテーマ設定",
+      "folder": "design",
+      "tags": [
+        "theming"
+      ],
+      "created": "2026-02-15T22:58:41.112Z",
+      "updated": "2026-02-15T22:58:41.112Z",
+      "template": "note",
+      "filePath": "/home/user/kami/.kami/vault/design/daisyUI v5のセットアップとテーマ設定.md"
+    },
+    "Hono + React SSR on Bunの構成パターン": {
+      "slug": "Hono + React SSR on Bunの構成パターン",
+      "title": "Hono + React SSR on Bunの構成パターン",
+      "folder": "design",
+      "tags": [
+        "bun"
+      ],
+      "created": "2026-02-15T22:59:03.746Z",
+      "updated": "2026-02-15T22:59:03.746Z",
+      "template": "note",
+      "filePath": "/home/user/kami/.kami/vault/design/Hono + React SSR on Bunの構成パターン.md"
+    },
+    "WebUIハイブリッドレンダリングの設計判断": {
+      "slug": "WebUIハイブリッドレンダリングの設計判断",
+      "title": "WebUIハイブリッドレンダリングの設計判断",
+      "folder": "design",
+      "tags": [
+        "webui"
+      ],
+      "created": "2026-02-15T22:59:24.917Z",
+      "updated": "2026-02-15T22:59:24.917Z",
+      "template": "note",
+      "filePath": "/home/user/kami/.kami/vault/design/WebUIハイブリッドレンダリングの設計判断.md"
+    }
+  }
+}
