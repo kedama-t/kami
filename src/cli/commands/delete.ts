@@ -5,6 +5,7 @@ import { getScopeRoot } from "../../core/scope.ts";
 import type { Scope } from "../../types/scope.ts";
 import { KamiError, EXIT_CODES } from "../../types/result.ts";
 import { jsonSuccess, handleError } from "../helpers/output.ts";
+import { runPreHook, runPostHook } from "../helpers/hooks.ts";
 
 export default defineCommand({
   meta: {
@@ -80,6 +81,9 @@ export default defineCommand({
         }
       }
 
+      // Run pre-delete hook
+      await runPreHook("article:pre-delete", resolved.scope, resolved.meta);
+
       const { meta, scope } = await deleteArticle(
         args.slug,
         args.scope as Scope | undefined,
@@ -88,6 +92,9 @@ export default defineCommand({
       // Remove from index
       const root = await getScopeRoot(scope);
       await removeFromIndex(root, meta.slug);
+
+      // Run post-delete hook
+      await runPostHook("article:post-delete", scope, meta);
 
       if (args.quiet) return;
 

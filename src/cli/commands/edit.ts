@@ -1,10 +1,11 @@
 import { defineCommand } from "citty";
-import { updateArticle } from "../../core/article.ts";
+import { updateArticle, resolveSlug } from "../../core/article.ts";
 import { upsertInIndex } from "../../core/index-manager.ts";
 import { getScopeRoot } from "../../core/scope.ts";
 import type { Scope } from "../../types/scope.ts";
 import { jsonSuccess, handleError } from "../helpers/output.ts";
 import { readBody } from "../helpers/input.ts";
+import { runPreHook, runPostHook } from "../helpers/hooks.ts";
 
 export default defineCommand({
   meta: {
@@ -92,6 +93,13 @@ export default defineCommand({
         appendContent = await readBody(args.append);
       }
 
+      // Resolve slug and run pre-update hook
+      const resolved = await resolveSlug(
+        args.slug,
+        args.scope as Scope | undefined,
+      );
+      await runPreHook("article:pre-update", resolved.scope, resolved.meta);
+
       const result = await updateArticle(args.slug, {
         title: args.title,
         addTags,
@@ -107,6 +115,9 @@ export default defineCommand({
       // Update index
       const root = await getScopeRoot(result.scope);
       await upsertInIndex(root, result.meta);
+
+      // Run post-update hook
+      await runPostHook("article:post-update", result.scope, result.meta);
 
       if (args.quiet) return;
 
