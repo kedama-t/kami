@@ -46,6 +46,7 @@ api.post("/articles", async (c) => {
       tags?: string[];
       template?: string;
       scope?: Scope;
+      slug?: string;
       body?: string;
       draft?: boolean;
     }>();
@@ -59,6 +60,7 @@ api.post("/articles", async (c) => {
       tags: body.tags,
       template: body.template,
       scope: body.scope,
+      slug: body.slug || undefined,
       body: body.body,
       draft: body.draft,
     });
@@ -98,14 +100,18 @@ api.put("/articles/:scope/:slug", async (c) => {
     const { scope, slug } = c.req.param();
     const body = await c.req.json<{
       title?: string;
+      slug?: string;
       body?: string;
       addTags?: string[];
       removeTags?: string[];
       draft?: boolean;
     }>();
 
+    const slugChanged = body.slug !== undefined && body.slug !== slug;
+
     const article = await updateArticle(slug, {
       title: body.title,
+      slug: body.slug,
       body: body.body,
       addTags: body.addTags,
       removeTags: body.removeTags,
@@ -115,6 +121,13 @@ api.put("/articles/:scope/:slug", async (c) => {
 
     // Update index and links
     const scopeRoot = await getScopeRoot(article.scope);
+
+    // If slug changed, remove old index entry and links
+    if (slugChanged) {
+      await removeFromIndex(scopeRoot, slug);
+      await removeLinks(scopeRoot, slug, article.scope);
+    }
+
     await upsertInIndex(scopeRoot, article.meta);
     const parsedLinks = parseWikiLinks(article.body);
     await updateLinks(scopeRoot, article.meta.slug, parsedLinks, article.scope);
@@ -129,6 +142,7 @@ api.put("/articles/:scope/:slug", async (c) => {
       data: {
         slug: article.meta.slug,
         scope: article.scope,
+        folder: article.meta.folder,
         title: article.meta.title,
       },
     });

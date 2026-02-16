@@ -283,17 +283,49 @@ export async function updateArticle(
     body = body ? `${body}\n\n${changes.append}` : changes.append;
   }
 
-  // Write back
+  // Handle slug rename
+  let newSlug = article.meta.slug;
+  let newFilePath = article.meta.filePath;
+
+  if (changes.slug !== undefined && changes.slug !== article.meta.slug) {
+    newSlug = changes.slug.trim().replace(INVALID_CHARS, "-");
+    if (!newSlug) {
+      throw new KamiError(
+        "Slug cannot be empty",
+        "VALIDATION_ERROR",
+        EXIT_CODES.GENERAL_ERROR,
+      );
+    }
+    const dir = dirname(article.meta.filePath);
+    newFilePath = join(dir, `${newSlug}.md`);
+
+    if (await storage.exists(newFilePath)) {
+      throw new KamiError(
+        `Article with slug "${newSlug}" already exists`,
+        "ARTICLE_ALREADY_EXISTS",
+        EXIT_CODES.GENERAL_ERROR,
+      );
+    }
+  }
+
+  // Write to (possibly new) file path
   const content = serializeFrontmatter(fm, body);
-  await storage.writeFile(article.meta.filePath, content);
+  await storage.writeFile(newFilePath, content);
+
+  // If slug changed, delete old file
+  if (newFilePath !== article.meta.filePath) {
+    await storage.deleteFile(article.meta.filePath);
+  }
 
   const updatedMeta: ArticleMeta = {
     ...article.meta,
+    slug: newSlug,
     title: fm.title,
     tags: fm.tags,
     updated: fm.updated,
     aliases: fm.aliases,
     draft: fm.draft,
+    filePath: newFilePath,
   };
 
   return { meta: updatedMeta, body, scope: article.scope };

@@ -50,6 +50,7 @@ export interface CreateArticleOptions {
 /** Options for updating an article */
 export interface UpdateArticleOptions {
   title?: string;
+  slug?: string;
   addTags?: string[];
   removeTags?: string[];
   body?: string;
