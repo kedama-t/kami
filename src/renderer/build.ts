@@ -1,4 +1,6 @@
-import { join } from "node:path";
+import { copyFile, readdir } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { renderToString } from "react-dom/server";
 import React from "react";
 import type { Scope } from "../types/scope.ts";
@@ -24,6 +26,47 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
 
 const storage = new LocalStorage();
+
+/**
+ * Get the package root directory from the current module location.
+ * Works in both Bun and Node.js environments.
+ */
+function getPackageRoot(): string {
+  const currentDir = dirname(fileURLToPath(import.meta.url));
+  // src/renderer/build.ts → package root is ../../
+  return resolve(currentDir, "..", "..");
+}
+
+/**
+ * Copy pre-built assets (edit.js, style.css, etc.) from the installed package's
+ * dist/assets/ to the local output directory.
+ * When the package is installed via npm/bun, the bundled assets live inside
+ * the package directory, not the user's working directory.
+ * In development mode (source and target are the same), this is a no-op.
+ */
+export async function copyBundledAssets(outDir: string): Promise<void> {
+  const packageRoot = getPackageRoot();
+  const bundledAssetsDir = join(packageRoot, "dist", "assets");
+  const targetAssetsDir = resolve(outDir, "assets");
+
+  // Skip if source and target are the same directory (development mode)
+  if (resolve(bundledAssetsDir) === targetAssetsDir) {
+    return;
+  }
+
+  try {
+    const entries = await readdir(bundledAssetsDir, { withFileTypes: true });
+    await storage.mkdir(targetAssetsDir);
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      const src = join(bundledAssetsDir, entry.name);
+      const dest = join(targetAssetsDir, entry.name);
+      await copyFile(src, dest);
+    }
+  } catch {
+    // Bundled assets directory not found (e.g., development without pre-build)
+  }
+}
 
 export interface BuildOptions {
   slug?: string;
@@ -133,6 +176,9 @@ export async function buildStaticSite(
   await storage.mkdir(join(outDir, "assets"));
   await storage.mkdir(join(outDir, "articles"));
   await storage.mkdir(join(outDir, "tags"));
+
+  // Copy pre-built assets from package to output directory
+  await copyBundledAssets(outDir);
 
   // Load indices for all scopes
   const localIndex: MetadataIndex = localRoot
