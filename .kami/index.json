@@ -47,6 +47,18 @@
       "updated": "2026-02-15T22:59:24.917Z",
       "template": "note",
       "filePath": "/home/user/kami/.kami/vault/design/WebUIハイブリッドレンダリングの設計判断.md"
+    },
+    "WebUI Phase 4 実装ノート": {
+      "slug": "WebUI Phase 4 実装ノート",
+      "title": "WebUI Phase 4 実装ノート",
+      "folder": "design",
+      "tags": [
+        "webui"
+      ],
+      "created": "2026-02-16T04:06:13.327Z",
+      "updated": "2026-02-16T04:06:13.327Z",
+      "template": "note",
+      "filePath": "/home/user/kami/.kami/vault/design/WebUI Phase 4 実装ノート.md"
     }
   }
 }
