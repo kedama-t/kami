@@ -18,7 +18,9 @@ import { LocalStorage } from "@/storage/local.ts";
 // remark/rehype pipeline
 import { unified } from "unified";
 import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
+import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
 
 const storage = new LocalStorage();
@@ -97,8 +99,10 @@ export function resolveWikiLinksForWeb(
 /** Convert Markdown to HTML using remark/rehype */
 async function markdownToHtml(markdown: string): Promise<string> {
   const result = await unified()
+    .use(remarkGfm)
     .use(remarkParse)
     .use(remarkRehype)
+    .use(rehypeHighlight)
     .use(rehypeStringify)
     .process(markdown);
   return String(result);
