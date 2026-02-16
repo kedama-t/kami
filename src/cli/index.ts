@@ -15,6 +15,7 @@ import exportCmd from "./commands/export.ts";
 import reindex from "./commands/reindex.ts";
 import build from "./commands/build.ts";
 import serve from "./commands/serve.ts";
+import install from "./commands/install.ts";
 
 const main = defineCommand({
   meta: {
@@ -37,6 +38,7 @@ const main = defineCommand({
     reindex,
     build,
     serve,
+    install,
   },
 });
 
