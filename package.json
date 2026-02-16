@@ -11,10 +11,23 @@
   "scripts": {
     "dev": "bun run src/cli/index.ts",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "css:build": "bunx @tailwindcss/cli -i src/renderer/styles/app.css -o dist/assets/style.css --minify",
+    "css:watch": "bunx @tailwindcss/cli -i src/renderer/styles/app.css -o dist/assets/style.css --watch",
+    "client:build": "bunx vite build",
+    "build": "bun run css:build && bun run client:build && bun run src/cli/index.ts build",
+    "serve": "bun run src/cli/index.ts serve"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@tailwindcss/cli": "^4.1.18",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/bun": "latest",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "daisyui": "^5.5.18",
+    "tailwindcss": "^4.1.18",
+    "vite": "^7.3.1"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -23,7 +36,10 @@
     "budoux": "^0.7.0",
     "citty": "^0.2.1",
     "gray-matter": "^4.0.3",
+    "hono": "^4.11.9",
     "minisearch": "^7.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "rehype-stringify": "^10.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",

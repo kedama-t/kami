@@ -11,7 +11,7 @@ const jsYaml = require("js-yaml");
 
 const yamlEngine = {
   parse: (str: string) => jsYaml.load(str, { schema: jsYaml.CORE_SCHEMA }),
-  stringify: (obj: Record<string, unknown>) =>
+  stringify: (obj: object) =>
     jsYaml.dump(obj, { lineWidth: -1, schema: jsYaml.CORE_SCHEMA }),
 };
 

@@ -35,7 +35,7 @@ export function expandVariables(
   context: HookContext,
 ): string {
   return command.replace(/\$\{(\w+)\}/g, (_, key: string) => {
-    const val = (context as Record<string, unknown>)[key];
+    const val = (context as unknown as Record<string, unknown>)[key];
     if (val === undefined || val === null) return "";
     if (Array.isArray(val)) return val.join(",");
     return String(val);
