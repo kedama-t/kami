@@ -1,6 +1,6 @@
 {
   "name": "@kami-pkm/kami",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Knowledge Agent Markdown Interface - AI-friendly personal knowledge base",
   "module": "src/cli/index.ts",
   "type": "module",
@@ -9,6 +9,7 @@
     "kami": "src/cli/index.ts"
   },
   "files": [
+    ".claude",
     "src",
     "templates",
     "dist/assets"
