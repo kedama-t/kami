@@ -1,12 +1,20 @@
 {
-  "name": "kami",
+  "name": "@kami-pkm/kami",
   "version": "0.1.0",
   "description": "Knowledge Agent Markdown Interface - AI-friendly personal knowledge base",
   "module": "src/cli/index.ts",
   "type": "module",
-  "private": true,
+  "license": "MIT",
   "bin": {
     "kami": "src/cli/index.ts"
+  },
+  "files": [
+    "src",
+    "templates",
+    "dist/assets"
+  ],
+  "engines": {
+    "bun": ">=1.0.0"
   },
   "scripts": {
     "dev": "bun run src/cli/index.ts",
@@ -16,8 +24,29 @@
     "css:watch": "bunx @tailwindcss/cli -i src/renderer/styles/app.css -o dist/assets/style.css --watch",
     "client:build": "bunx vite build",
     "build": "bun run css:build && bun run client:build && bun run src/cli/index.ts build",
-    "serve": "bun run src/cli/index.ts serve"
+    "serve": "bun run src/cli/index.ts serve",
+    "prepublishOnly": "bun run css:build && bun run client:build"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kedama-t/kami.git"
+  },
+  "homepage": "https://github.com/kedama-t/kami#readme",
+  "bugs": {
+    "url": "https://github.com/kedama-t/kami/issues"
+  },
+  "keywords": [
+    "knowledge-base",
+    "pkm",
+    "markdown",
+    "cli",
+    "bun",
+    "personal-knowledge-management",
+    "zettelkasten"
+  ],
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",
