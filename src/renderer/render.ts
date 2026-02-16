@@ -8,8 +8,6 @@ interface RenderOptions {
   inlineScript?: string;
 }
 
-const THEME_RESTORE_SCRIPT = `const t=localStorage.getItem("kami-theme");if(t)document.documentElement.setAttribute("data-theme",t);`;
-
 /**
  * 完全なHTMLドキュメントを生成する。
  * Layout コンポーネントでラップ済みの bodyHtml を受け取り、
@@ -22,9 +20,7 @@ export function renderFullPage(options: RenderOptions): string {
     .map((src) => `<script type="module" src="${src}"></script>`)
     .join("\n    ");
 
-  const inlineScriptTag = inlineScript
-    ? `<script>${inlineScript}</script>`
-    : `<script>${THEME_RESTORE_SCRIPT}</script>`;
+  const inlineScriptTag = inlineScript ?? `<script>${inlineScript}</script>`;
 
   return `<!DOCTYPE html>
 <html lang="ja">
@@ -33,6 +29,7 @@ export function renderFullPage(options: RenderOptions): string {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${escapeHtml(title)} - kami</title>
     <link rel="stylesheet" href="/assets/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/rose-pine-moon.min.css">
     ${inlineScriptTag}
     ${scriptTags}
   </head>
