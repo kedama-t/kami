@@ -1,14 +1,14 @@
 import { Hono } from "hono";
 import React from "react";
-import type { Scope } from "@/types/scope.ts";
-import { readArticle } from "@/core/article.ts";
-import { search } from "@/core/search.ts";
-import { loadIndex, queryIndex } from "@/core/index-manager.ts";
-import { listTemplates } from "@/core/template.ts";
-import { renderPage } from "@/renderer/render.ts";
-import { SearchPage } from "@/renderer/components/SearchPage.tsx";
-import { EditPage } from "@/renderer/components/EditPage.tsx";
-import { CreatePage } from "@/renderer/components/CreatePage.tsx";
+import type { Scope } from "../../types/scope.ts";
+import { readArticle } from "../../core/article.ts";
+import { search } from "../../core/search.ts";
+import { loadIndex, queryIndex } from "../../core/index-manager.ts";
+import { listTemplates } from "../../core/template.ts";
+import { renderPage } from "../../renderer/render.ts";
+import { SearchPage } from "../../renderer/components/SearchPage.tsx";
+import { EditPage } from "../../renderer/components/EditPage.tsx";
+import { CreatePage } from "../../renderer/components/CreatePage.tsx";
 import { scopeMiddleware, type ScopeVariables } from "../middleware/scope.ts";
 
 const pages = new Hono<{ Variables: ScopeVariables }>();

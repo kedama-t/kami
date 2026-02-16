@@ -1,5 +1,5 @@
 import React from "react";
-import type { Scope } from "@/types/scope.ts";
+import type { Scope } from "../../types/scope.ts";
 import { Layout } from "./Layout.tsx";
 import { ArticleList } from "./common/ArticleList.tsx";
 
@@ -32,7 +32,11 @@ export function SearchPage({ query, results, total, scope }: SearchPageProps) {
           placeholder="Search articles…"
           className="input input-bordered flex-1"
         />
-        <select name="scope" defaultValue={scope} className="select select-bordered">
+        <select
+          name="scope"
+          defaultValue={scope}
+          className="select select-bordered"
+        >
           <option value="all">All scopes</option>
           <option value="local">Local</option>
           <option value="global">Global</option>

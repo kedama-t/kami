@@ -1,5 +1,5 @@
 import React from "react";
-import type { Scope } from "@/types/scope.ts";
+import type { Scope } from "../../types/scope.ts";
 import { Layout } from "./Layout.tsx";
 import { ScopeBadge } from "./common/ScopeBadge.tsx";
 import { TagBadge } from "./common/TagBadge.tsx";
@@ -24,7 +24,11 @@ interface ArticlePageProps {
   }>;
 }
 
-export function ArticlePage({ article, bodyHtml, backlinks }: ArticlePageProps) {
+export function ArticlePage({
+  article,
+  bodyHtml,
+  backlinks,
+}: ArticlePageProps) {
   const editUrl = `/articles/${article.scope}/${article.folder}/${article.slug}/edit`;
 
   return (
@@ -32,7 +36,9 @@ export function ArticlePage({ article, bodyHtml, backlinks }: ArticlePageProps) 
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
           <ScopeBadge scope={article.scope} />
-          <span className="text-sm text-base-content/60">{article.folder}/</span>
+          <span className="text-sm text-base-content/60">
+            {article.folder}/
+          </span>
         </div>
         <h1 className="text-3xl font-bold mb-3">{article.title}</h1>
         <div className="flex flex-wrap gap-2 mb-2">

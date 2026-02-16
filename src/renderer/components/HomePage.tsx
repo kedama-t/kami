@@ -1,5 +1,5 @@
 import React from "react";
-import type { Scope } from "@/types/scope.ts";
+import type { Scope } from "../../types/scope.ts";
 import { Layout } from "./Layout.tsx";
 import { ArticleList } from "./common/ArticleList.tsx";
 import { TagBadge } from "./common/TagBadge.tsx";

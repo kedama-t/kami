@@ -1,5 +1,5 @@
 import React from "react";
-import type { Scope } from "@/types/scope.ts";
+import type { Scope } from "../../types/scope.ts";
 import { Layout } from "./Layout.tsx";
 
 interface EditPageProps {
@@ -26,11 +26,7 @@ export function EditPage({ article }: EditPageProps) {
   });
 
   return (
-    <Layout
-      title={`Edit: ${article.title}`}
-      scripts={["/assets/edit.js"]}
-      wide
-    >
+    <Layout title={`Edit: ${article.title}`} scripts={["/assets/edit.js"]} wide>
       <div id="edit-app">
         <h1 className="text-2xl font-bold mb-6">Edit: {article.title}</h1>
 
@@ -68,7 +64,9 @@ export function EditPage({ article }: EditPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-control">
               <label className="label" htmlFor="edit-tags">
-                <span className="label-text font-medium">Tags (comma separated)</span>
+                <span className="label-text font-medium">
+                  Tags (comma separated)
+                </span>
               </label>
               <input
                 id="edit-tags"
@@ -96,7 +94,10 @@ export function EditPage({ article }: EditPageProps) {
           </div>
 
           {/* Editor / Preview grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ minHeight: "60vh" }}>
+          <div
+            className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+            style={{ minHeight: "60vh" }}
+          >
             <div className="form-control flex flex-col">
               <label className="label" htmlFor="edit-body">
                 <span className="label-text font-medium">Body</span>

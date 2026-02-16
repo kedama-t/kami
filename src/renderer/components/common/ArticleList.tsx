@@ -1,5 +1,5 @@
 import React from "react";
-import type { Scope } from "@/types/scope.ts";
+import type { Scope } from "../../../types/scope.ts";
 import { ScopeBadge } from "./ScopeBadge.tsx";
 import { TagBadge } from "./TagBadge.tsx";
 
@@ -28,7 +28,10 @@ export function ArticleList({ articles }: ArticleListProps) {
   return (
     <div className="flex flex-col gap-3">
       {articles.map((article) => (
-        <div key={`${article.scope}-${article.slug}`} className="card card-compact bg-base-100 shadow-sm">
+        <div
+          key={`${article.scope}-${article.slug}`}
+          className="card card-compact bg-base-100 shadow-sm"
+        >
           <div className="card-body">
             <div className="flex items-center gap-2">
               <ScopeBadge scope={article.scope} />
