@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import { defineCommand, runMain } from "citty";
+import pkg from "../../package.json";
 import init from "./commands/init.ts";
 import create from "./commands/create.ts";
 import read from "./commands/read.ts";
@@ -18,9 +19,8 @@ import serve from "./commands/serve.ts";
 const main = defineCommand({
   meta: {
     name: "kami",
-    version: "0.1.0",
-    description:
-      "Knowledge Agent Markdown Interface - AI-friendly personal knowledge base",
+    version: pkg.version,
+    description: pkg.description,
   },
   subCommands: {
     init,
