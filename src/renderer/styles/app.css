@@ -1,7 +1,20 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-@plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "pastel";
+  default: true;
+  color-scheme: "light";
+  --color-neutral: #232136;
+}
+
+@plugin "daisyui/theme" {
+  name: "dim";
+  default: false;
+  color-scheme: "dark";
+  prefersdark: true;
+  --color-neutral: #232136;
 }
 
 /* Tailwind にコンポーネントファイルをスキャンさせる */
