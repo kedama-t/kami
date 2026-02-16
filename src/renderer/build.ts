@@ -1,19 +1,19 @@
 import { join } from "node:path";
 import { renderToString } from "react-dom/server";
 import React from "react";
-import type { Scope } from "@/types/scope.ts";
-import type { MetadataIndex } from "@/types/index.ts";
-import type { ArticleMeta } from "@/types/article.ts";
-import { resolveScope, getScopePaths, getScopeRoot } from "@/core/scope.ts";
-import { loadIndex, queryIndex } from "@/core/index-manager.ts";
-import { readArticle } from "@/core/article.ts";
-import { parseWikiLinks } from "@/core/linker.ts";
-import { getBacklinks, loadLinkGraph } from "@/core/linker.ts";
+import type { Scope } from "../types/scope.ts";
+import type { MetadataIndex } from "../types/index.ts";
+import type { ArticleMeta } from "../types/article.ts";
+import { resolveScope, getScopePaths, getScopeRoot } from "../core/scope.ts";
+import { loadIndex, queryIndex } from "../core/index-manager.ts";
+import { readArticle } from "../core/article.ts";
+import { parseWikiLinks } from "../core/linker.ts";
+import { getBacklinks, loadLinkGraph } from "../core/linker.ts";
 import { renderFullPage } from "./render.ts";
 import { ArticlePage } from "./components/ArticlePage.tsx";
 import { HomePage } from "./components/HomePage.tsx";
 import { TagsPage } from "./components/TagsPage.tsx";
-import { LocalStorage } from "@/storage/local.ts";
+import { LocalStorage } from "../storage/local.ts";
 
 // remark/rehype pipeline
 import { unified } from "unified";
@@ -220,7 +220,7 @@ async function buildAllArticlePages(
     const promises = articles.map(async (meta) => {
       try {
         const content = await storage.readFile(meta.filePath);
-        const { body } = await import("@/core/frontmatter.ts").then((m) =>
+        const { body } = await import("../core/frontmatter.ts").then((m) =>
           m.parseFrontmatter(content),
         );
 

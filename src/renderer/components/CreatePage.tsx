@@ -1,5 +1,5 @@
 import React from "react";
-import type { Scope } from "@/types/scope.ts";
+import type { Scope } from "../../types/scope.ts";
 import { Layout } from "./Layout.tsx";
 
 interface CreatePageProps {
@@ -8,7 +8,11 @@ interface CreatePageProps {
   defaultScope: Scope;
 }
 
-export function CreatePage({ templates, folders, defaultScope }: CreatePageProps) {
+export function CreatePage({
+  templates,
+  folders,
+  defaultScope,
+}: CreatePageProps) {
   const propsJson = JSON.stringify({
     templates,
     folders,
@@ -109,7 +113,9 @@ export function CreatePage({ templates, folders, defaultScope }: CreatePageProps
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-control">
               <label className="label" htmlFor="create-tags">
-                <span className="label-text font-medium">Tags (comma separated)</span>
+                <span className="label-text font-medium">
+                  Tags (comma separated)
+                </span>
               </label>
               <input
                 id="create-tags"
@@ -135,7 +141,10 @@ export function CreatePage({ templates, folders, defaultScope }: CreatePageProps
           </div>
 
           {/* Editor / Preview grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ minHeight: "60vh" }}>
+          <div
+            className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+            style={{ minHeight: "60vh" }}
+          >
             <div className="form-control flex flex-col">
               <label className="label" htmlFor="create-body">
                 <span className="label-text font-medium">Body</span>
@@ -162,7 +171,11 @@ export function CreatePage({ templates, folders, defaultScope }: CreatePageProps
 
           {/* Actions */}
           <div className="flex gap-2 pt-2">
-            <button type="button" id="create-submit" className="btn btn-primary">
+            <button
+              type="button"
+              id="create-submit"
+              className="btn btn-primary"
+            >
               Create
             </button>
             <a href="/" className="btn btn-ghost">

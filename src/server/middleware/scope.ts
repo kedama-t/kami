@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
-import type { Scope } from "@/types/scope.ts";
-import { resolveScope } from "@/core/scope.ts";
+import type { Scope } from "../../types/scope.ts";
+import { resolveScope } from "../../core/scope.ts";
 
 export type ScopeVariables = {
   scopes: Scope[];

@@ -1,13 +1,13 @@
 import { Hono } from "hono";
-import type { Scope } from "@/types/scope.ts";
-import type { ErrorCode } from "@/types/result.ts";
-import { KamiError } from "@/types/result.ts";
-import { createArticle, readArticle, updateArticle, deleteArticle } from "@/core/article.ts";
-import { search } from "@/core/search.ts";
-import { getScopeRoot } from "@/core/scope.ts";
-import { upsertInIndex, removeFromIndex } from "@/core/index-manager.ts";
-import { parseWikiLinks, updateLinks, removeLinks, getBacklinks } from "@/core/linker.ts";
-import { buildStaticSite } from "@/renderer/build.ts";
+import type { Scope } from "../../types/scope.ts";
+import type { ErrorCode } from "../../types/result.ts";
+import { KamiError } from "../../types/result.ts";
+import { createArticle, readArticle, updateArticle, deleteArticle } from "../../core/article.ts";
+import { search } from "../../core/search.ts";
+import { getScopeRoot } from "../../core/scope.ts";
+import { upsertInIndex, removeFromIndex } from "../../core/index-manager.ts";
+import { parseWikiLinks, updateLinks, removeLinks, getBacklinks } from "../../core/linker.ts";
+import { buildStaticSite } from "../../renderer/build.ts";
 import { scopeMiddleware, type ScopeVariables } from "../middleware/scope.ts";
 
 // remark/rehype pipeline for preview
