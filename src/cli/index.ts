@@ -12,6 +12,8 @@ import backlinks from "./commands/backlinks.ts";
 import template from "./commands/template.ts";
 import exportCmd from "./commands/export.ts";
 import reindex from "./commands/reindex.ts";
+import build from "./commands/build.ts";
+import serve from "./commands/serve.ts";
 
 const main = defineCommand({
   meta: {
@@ -33,6 +35,8 @@ const main = defineCommand({
     template,
     export: exportCmd,
     reindex,
+    build,
+    serve,
   },
 });
 
