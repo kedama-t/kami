@@ -5,9 +5,14 @@ interface LayoutProps {
   children: React.ReactNode;
   currentPath?: string;
   scripts?: string[];
+  wide?: boolean;
 }
 
-export function Layout({ title, children, currentPath }: LayoutProps) {
+export function Layout({ title, children, currentPath, wide }: LayoutProps) {
+  const containerClass = wide
+    ? "flex-1 container mx-auto px-4 py-6 max-w-6xl"
+    : "flex-1 container mx-auto px-4 py-6 max-w-4xl";
+
   return (
     <div className="min-h-screen flex flex-col" data-theme="">
       {/* Navbar */}
@@ -36,7 +41,7 @@ export function Layout({ title, children, currentPath }: LayoutProps) {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 container mx-auto px-4 py-6 max-w-4xl">
+      <main className={containerClass}>
         {children}
       </main>
 
