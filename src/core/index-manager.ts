@@ -1,20 +1,59 @@
-import { join, relative, basename } from "node:path";
+import { join, relative, basename, dirname, resolve, isAbsolute } from "node:path";
+import { homedir } from "node:os";
 import type { MetadataIndex } from "../types/index.ts";
 import type { ArticleMeta } from "../types/article.ts";
 import type { Scope } from "../types/scope.ts";
 import type { ScopePaths } from "../types/scope.ts";
 import { LocalStorage } from "../storage/local.ts";
 import { parseFrontmatter } from "./frontmatter.ts";
-import { getScopePaths, getScopeRoot } from "./scope.ts";
+import { getScopePaths, getScopeRoot, getGlobalRoot } from "./scope.ts";
 
 const storage = new LocalStorage();
+
+/** Check if a scope root is the global scope */
+function isGlobalScope(scopeRoot: string): boolean {
+  return resolve(scopeRoot) === resolve(getGlobalRoot());
+}
+
+/** Convert an absolute filePath to a stored relative path */
+export function toStoredFilePath(scopeRoot: string, absolutePath: string): string {
+  if (isGlobalScope(scopeRoot)) {
+    const home = homedir();
+    const rel = relative(home, absolutePath);
+    return `~/${rel}`;
+  } else {
+    const projectRoot = dirname(scopeRoot);
+    return relative(projectRoot, absolutePath);
+  }
+}
+
+/** Convert a stored relative path back to an absolute path */
+export function fromStoredFilePath(scopeRoot: string, storedPath: string): string {
+  if (storedPath.startsWith("~/")) {
+    return join(homedir(), storedPath.slice(2));
+  } else if (storedPath.startsWith(".kami/") || storedPath.startsWith(".kami\\")) {
+    const projectRoot = dirname(scopeRoot);
+    return join(projectRoot, storedPath);
+  } else if (isAbsolute(storedPath)) {
+    // Backwards compatibility: already absolute
+    return storedPath;
+  } else {
+    const projectRoot = dirname(scopeRoot);
+    return join(projectRoot, storedPath);
+  }
+}
 
 /** Load the metadata index for a scope */
 export async function loadIndex(scopeRoot: string): Promise<MetadataIndex> {
   const paths = getScopePaths(scopeRoot);
   try {
     const raw = await storage.readFile(paths.indexFile);
-    return JSON.parse(raw);
+    const parsed: MetadataIndex = JSON.parse(raw);
+    // Convert stored relative paths back to absolute
+    for (const meta of Object.values(parsed.articles)) {
+      meta.filePath = fromStoredFilePath(scopeRoot, meta.filePath);
+    }
+    return parsed;
   } catch {
     return { articles: {} };
   }
@@ -26,7 +65,16 @@ export async function saveIndex(
   index: MetadataIndex,
 ): Promise<void> {
   const paths = getScopePaths(scopeRoot);
-  await storage.writeFile(paths.indexFile, JSON.stringify(index, null, 2));
+  // Convert absolute paths to relative for storage
+  const stored: MetadataIndex = {
+    articles: Object.fromEntries(
+      Object.entries(index.articles).map(([slug, meta]) => [
+        slug,
+        { ...meta, filePath: toStoredFilePath(scopeRoot, meta.filePath) },
+      ]),
+    ),
+  };
+  await storage.writeFile(paths.indexFile, JSON.stringify(stored, null, 2));
 }
 
 /** Add or update an article in the index */

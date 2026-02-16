@@ -26,6 +26,7 @@ kami (Knowledge Agent Markdown Interface) — a local-first personal knowledge b
 - Use `--force --json` for delete (avoids interactive prompt)
 - Pipe body content via `--body -` with stdin
 - Check `error.code` in JSON on failure (see [reference/error-codes.md](reference/error-codes.md))
+- When creating articles, always provide an explicit URL-safe slug using `--slug`. Use only ASCII lowercase letters, numbers, and hyphens (e.g., `--slug "my-article-title"`). Never use non-ASCII characters, spaces, or special characters in slugs.
 
 ## Scopes
 

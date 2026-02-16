@@ -27,6 +27,7 @@ import {
   expandTemplate,
   buildTemplateVariables,
 } from "./template.ts";
+import { loadIndex } from "./index-manager.ts";
 
 const storage = new LocalStorage();
 
@@ -54,16 +55,9 @@ export async function resolveSlug(
 
   for (const s of scopes) {
     const root = s === "local" ? localRoot! : globalRoot;
-    const paths = getScopePaths(root);
 
-    // Try to load index
-    let indexData: { articles: Record<string, ArticleMeta> } = { articles: {} };
-    try {
-      const raw = await storage.readFile(paths.indexFile);
-      indexData = JSON.parse(raw);
-    } catch {
-      // Index doesn't exist yet, scan files instead
-    }
+    // Load index (converts stored relative paths to absolute)
+    const indexData = await loadIndex(root);
 
     // Search in index: by slug (exact key match)
     if (indexData.articles[slug]) {

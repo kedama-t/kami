@@ -306,10 +306,10 @@ async function buildArticlePage(
     bodyHtml: html,
   });
 
-  // Write file
-  const articleDir = join(outDir, "articles", scope, meta.folder);
+  // Write file as slug/index.html for clean URLs
+  const articleDir = join(outDir, "articles", scope, meta.folder, meta.slug);
   await storage.mkdir(articleDir);
-  await storage.writeFile(join(articleDir, `${meta.slug}.html`), fullHtml);
+  await storage.writeFile(join(articleDir, "index.html"), fullHtml);
 }
 
 async function buildHomePage(
