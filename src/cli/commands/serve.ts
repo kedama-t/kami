@@ -1,6 +1,6 @@
 import { defineCommand } from "citty";
 import { createApp } from "../../server/app.ts";
-import { buildStaticSite } from "../../renderer/build.ts";
+import { buildStaticSite, copyBundledAssets } from "../../renderer/build.ts";
 import { handleError } from "../helpers/output.ts";
 
 export default defineCommand({
@@ -30,6 +30,9 @@ export default defineCommand({
         console.log("Building static site...");
         const result = await buildStaticSite();
         console.log(`Built ${result.pagesBuilt} page(s).`);
+      } else {
+        // Even with --no-build, ensure bundled assets are available
+        await copyBundledAssets("dist");
       }
 
       const distDir = "dist";
