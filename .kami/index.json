@@ -89,10 +89,11 @@
       "title": "kami installコマンドの実装",
       "folder": "design",
       "tags": [
-        "architecture"
+        "architecture",
+        "agent-skills"
       ],
       "created": "2026-02-16T09:51:45.309Z",
-      "updated": "2026-02-16T09:51:45.309Z",
+      "updated": "2026-02-16T10:26:06.632Z",
       "template": "note",
       "filePath": "/home/user/kami/.kami/vault/design/kami installコマンドの実装.md"
     }
