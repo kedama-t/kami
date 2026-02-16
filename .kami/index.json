@@ -10,7 +10,7 @@
       "created": "2026-02-15T22:58:21.113Z",
       "updated": "2026-02-15T22:58:21.113Z",
       "template": "note",
-      "filePath": "/home/user/kami/.kami/vault/design/TailwindCSS v4のCSS-first設定とSSRでの注意点.md"
+      "filePath": ".kami/vault/design/TailwindCSS v4のCSS-first設定とSSRでの注意点.md"
     },
     "daisyUI v5のセットアップとテーマ設定": {
       "slug": "daisyUI v5のセットアップとテーマ設定",
@@ -22,7 +22,7 @@
       "created": "2026-02-15T22:58:41.112Z",
       "updated": "2026-02-15T22:58:41.112Z",
       "template": "note",
-      "filePath": "/home/user/kami/.kami/vault/design/daisyUI v5のセットアップとテーマ設定.md"
+      "filePath": ".kami/vault/design/daisyUI v5のセットアップとテーマ設定.md"
     },
     "Hono + React SSR on Bunの構成パターン": {
       "slug": "Hono + React SSR on Bunの構成パターン",
@@ -34,7 +34,7 @@
       "created": "2026-02-15T22:59:03.746Z",
       "updated": "2026-02-15T22:59:03.746Z",
       "template": "note",
-      "filePath": "/home/user/kami/.kami/vault/design/Hono + React SSR on Bunの構成パターン.md"
+      "filePath": ".kami/vault/design/Hono + React SSR on Bunの構成パターン.md"
     },
     "WebUIハイブリッドレンダリングの設計判断": {
       "slug": "WebUIハイブリッドレンダリングの設計判断",
@@ -46,7 +46,7 @@
       "created": "2026-02-15T22:59:24.917Z",
       "updated": "2026-02-15T22:59:24.917Z",
       "template": "note",
-      "filePath": "/home/user/kami/.kami/vault/design/WebUIハイブリッドレンダリングの設計判断.md"
+      "filePath": ".kami/vault/design/WebUIハイブリッドレンダリングの設計判断.md"
     },
     "WebUI Phase 4 実装ノート": {
       "slug": "WebUI Phase 4 実装ノート",
@@ -58,7 +58,7 @@
       "created": "2026-02-16T04:06:13.327Z",
       "updated": "2026-02-16T04:06:13.327Z",
       "template": "note",
-      "filePath": "/home/user/kami/.kami/vault/design/WebUI Phase 4 実装ノート.md"
+      "filePath": ".kami/vault/design/WebUI Phase 4 実装ノート.md"
     },
     "npm公開の準備手順と注意点": {
       "slug": "npm公開の準備手順と注意点",
@@ -70,7 +70,7 @@
       "created": "2026-02-16T05:10:18.547Z",
       "updated": "2026-02-16T05:10:18.547Z",
       "template": "note",
-      "filePath": "/home/user/kami/.kami/vault/design/npm公開の準備手順と注意点.md"
+      "filePath": ".kami/vault/design/npm公開の準備手順と注意点.md"
     },
     "Bun専用パッケージのnpm公開ノウハウ": {
       "slug": "Bun専用パッケージのnpm公開ノウハウ",
@@ -82,7 +82,7 @@
       "created": "2026-02-16T05:10:41.401Z",
       "updated": "2026-02-16T05:10:41.401Z",
       "template": "note",
-      "filePath": "/home/user/kami/.kami/vault/troubleshooting/Bun専用パッケージのnpm公開ノウハウ.md"
+      "filePath": ".kami/vault/troubleshooting/Bun専用パッケージのnpm公開ノウハウ.md"
     },
     "kami installコマンドの実装": {
       "slug": "kami installコマンドの実装",
@@ -95,7 +95,19 @@
       "created": "2026-02-16T09:51:45.309Z",
       "updated": "2026-02-16T10:26:06.632Z",
       "template": "note",
-      "filePath": "/home/user/kami/.kami/vault/design/kami installコマンドの実装.md"
+      "filePath": ".kami/vault/design/kami installコマンドの実装.md"
+    },
+    "webui-fixes-relative-paths-clean-urls": {
+      "slug": "webui-fixes-relative-paths-clean-urls",
+      "title": "WebUI fixes: relative paths, clean URLs, slug rules",
+      "folder": "troubleshooting",
+      "tags": [
+        "bug-fix"
+      ],
+      "created": "2026-02-16T14:15:20.162Z",
+      "updated": "2026-02-16T14:15:20.162Z",
+      "template": "note",
+      "filePath": ".kami/vault/troubleshooting/webui-fixes-relative-paths-clean-urls.md"
     }
   }
 }
