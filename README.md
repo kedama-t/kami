@@ -1,4 +1,4 @@
-# kami
+# 📃kami
 
 **Knowledge Agent Markdown Interface** — AI-friendly personal knowledge base
 
