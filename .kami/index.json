@@ -108,6 +108,18 @@
       "updated": "2026-02-16T14:15:20.162Z",
       "template": "note",
       "filePath": ".kami/vault/troubleshooting/webui-fixes-relative-paths-clean-urls.md"
+    },
+    "kami-install-consola-prompt-fallback-nontty": {
+      "slug": "kami-install-consola-prompt-fallback-nontty",
+      "title": "kami install promptをconsolaに置換",
+      "folder": "implementation",
+      "tags": [
+        "install"
+      ],
+      "created": "2026-02-19T15:33:23.102Z",
+      "updated": "2026-02-19T15:33:23.102Z",
+      "template": "note",
+      "filePath": ".kami/vault/implementation/kami-install-consola-prompt-fallback-nontty.md"
     }
   }
 }

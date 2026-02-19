@@ -1,4 +1,5 @@
 import { defineCommand } from "citty";
+import { consola } from "consola";
 import {
   installSkill,
   INSTALL_TARGETS,
@@ -17,7 +18,44 @@ const LEVEL_OPTIONS = INSTALL_LEVELS.map(
   (l, i) => `[${i + 1}] ${l}`,
 ).join("  ");
 
-/** Line-buffered stdin reader that handles chunked input */
+async function promptForSelection<T extends readonly string[]>(
+  message: string,
+  optionsText: string,
+  values: T,
+  readLine?: () => Promise<string>,
+): Promise<T[number]> {
+  let answer = "";
+  if (process.stdin.isTTY) {
+    answer = await consola.prompt(`${message}:  ${optionsText}`, {
+      type: "text",
+      placeholder: "1",
+      cancel: "reject",
+    });
+  } else {
+    process.stdout.write(`${message}:  ${optionsText}\n> `);
+    answer = readLine ? await readLine() : "";
+  }
+
+  const idx = Number.parseInt(answer.trim(), 10) - 1;
+  if (Number.isNaN(idx) || idx < 0 || idx >= values.length) {
+    throw new KamiError(
+      "Invalid selection",
+      "VALIDATION_ERROR",
+      EXIT_CODES.GENERAL_ERROR,
+    );
+  }
+  const selected = values[idx];
+  if (selected === undefined) {
+    throw new KamiError(
+      "Invalid selection",
+      "VALIDATION_ERROR",
+      EXIT_CODES.GENERAL_ERROR,
+    );
+  }
+  return selected;
+}
+
+/** Line-buffered stdin reader for non-TTY input */
 class LineReader {
   private buffer = "";
   private reader: ReadableStreamDefaultReader<Uint8Array>;
@@ -41,10 +79,6 @@ class LineReader {
     const line = this.buffer.slice(0, idx).trim();
     this.buffer = this.buffer.slice(idx + 1);
     return line;
-  }
-
-  releaseLock() {
-    this.reader.releaseLock();
   }
 }
 
@@ -115,43 +149,26 @@ export default defineCommand({
       }
 
       // Interactive prompts for missing options
-      let lineReader: LineReader | null = null;
-      if (!target || !level) {
-        lineReader = new LineReader(Bun.stdin.stream());
+      const lineReader = process.stdin.isTTY
+        ? undefined
+        : new LineReader(Bun.stdin.stream());
+
+      if (!target) {
+        target = await promptForSelection(
+          "Target tool",
+          TARGET_OPTIONS,
+          INSTALL_TARGETS,
+          lineReader?.readLine.bind(lineReader),
+        );
       }
 
-      if (!target && lineReader) {
-        process.stdout.write(`Target tool:  ${TARGET_OPTIONS}\n> `);
-        const answer = await lineReader.readLine();
-        const idx = parseInt(answer, 10) - 1;
-        if (isNaN(idx) || idx < 0 || idx >= INSTALL_TARGETS.length) {
-          lineReader.releaseLock();
-          throw new KamiError(
-            "Invalid selection",
-            "VALIDATION_ERROR",
-            EXIT_CODES.GENERAL_ERROR,
-          );
-        }
-        target = INSTALL_TARGETS[idx];
-      }
-
-      if (!level && lineReader) {
-        process.stdout.write(`Install level:  ${LEVEL_OPTIONS}\n> `);
-        const answer = await lineReader.readLine();
-        const idx = parseInt(answer, 10) - 1;
-        if (isNaN(idx) || idx < 0 || idx >= INSTALL_LEVELS.length) {
-          lineReader.releaseLock();
-          throw new KamiError(
-            "Invalid selection",
-            "VALIDATION_ERROR",
-            EXIT_CODES.GENERAL_ERROR,
-          );
-        }
-        level = INSTALL_LEVELS[idx];
-      }
-
-      if (lineReader) {
-        lineReader.releaseLock();
+      if (!level) {
+        level = await promptForSelection(
+          "Install level",
+          LEVEL_OPTIONS,
+          INSTALL_LEVELS,
+          lineReader?.readLine.bind(lineReader),
+        );
       }
 
       const result = await installSkill(
