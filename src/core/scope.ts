@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { homedir } from "node:os";
 import type {
   Scope,
@@ -21,11 +21,50 @@ export function getGlobalRoot(): string {
   return join(homedir(), KAMI_DIR);
 }
 
+/**
+ * Module-level active vault directory for the global scope.
+ * Initialized lazily by initGlobalVaultPath(). null = not yet initialized.
+ */
+let _globalVaultDir: string | null = null;
+let _vaultInitialized = false;
+
+/** Load the global config from ~/.kami/config.json */
+export async function loadGlobalConfig(): Promise<KamiConfig> {
+  const configPath = join(getGlobalRoot(), "config.json");
+  try {
+    const content = await storage.readFile(configPath);
+    return JSON.parse(content) as KamiConfig;
+  } catch {
+    return {};
+  }
+}
+
+/** Save the global config to ~/.kami/config.json */
+export async function saveGlobalConfig(config: KamiConfig): Promise<void> {
+  const root = getGlobalRoot();
+  await storage.mkdir(root);
+  const configPath = join(root, "config.json");
+  await storage.writeFile(configPath, JSON.stringify(config, null, 2));
+}
+
+/** Initialize the active vault directory from config (called once per process) */
+async function initGlobalVaultPath(): Promise<void> {
+  if (_vaultInitialized) return;
+  _vaultInitialized = true;
+  const config = await loadGlobalConfig();
+  if (config.activeVault && config.vaults?.[config.activeVault]) {
+    _globalVaultDir = config.vaults[config.activeVault]!;
+  } else {
+    _globalVaultDir = join(getGlobalRoot(), "vault");
+  }
+}
+
 /** Get paths for a given scope root */
 export function getScopePaths(root: string): ScopePaths {
+  const isGlobal = resolve(root) === resolve(getGlobalRoot());
   return {
     root,
-    vault: join(root, "vault"),
+    vault: (isGlobal && _globalVaultDir) ? _globalVaultDir : join(root, "vault"),
     templates: join(root, "templates"),
     indexFile: join(root, "index.json"),
     linksFile: join(root, "links.json"),
@@ -63,6 +102,7 @@ export async function resolveScope(
   operation: OperationType = "read",
   cwd?: string,
 ): Promise<{ scopes: Scope[]; localRoot: string | null; globalRoot: string }> {
+  await initGlobalVaultPath();
   const globalRoot = getGlobalRoot();
   const localRoot = await findLocalRoot(cwd);
 

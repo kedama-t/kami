@@ -6,6 +6,10 @@ export interface KamiConfig {
   build?: {
     outDir?: string;
   };
+  /** Named vault registry: name -> absolute path to vault directory */
+  vaults?: Record<string, string>;
+  /** Active vault name (defaults to "default" which uses ~/.kami/vault) */
+  activeVault?: string;
 }
 
 /** Default global config */

@@ -8,7 +8,8 @@ export type ErrorCode =
   | "INVALID_FRONTMATTER"
   | "HOOK_BLOCKED"
   | "VALIDATION_ERROR"
-  | "IO_ERROR";
+  | "IO_ERROR"
+  | "VAULT_NOT_FOUND";
 
 /** Successful CLI JSON response */
 export interface SuccessResult<T = unknown> {
