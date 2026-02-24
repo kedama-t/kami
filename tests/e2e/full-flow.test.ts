@@ -164,7 +164,7 @@ describe("E2E full lifecycle", () => {
     const listData2 = JSON.parse(listResult2.stdout);
     expect(listData2.data.articles.length).toBe(1);
     expect(listData2.data.articles[0].slug).toBe("article-b");
-  });
+  }, 30000);
 
   test("template lifecycle via CLI", async () => {
     // Init

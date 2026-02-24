@@ -16,6 +16,7 @@ import reindex from "./commands/reindex.ts";
 import build from "./commands/build.ts";
 import serve from "./commands/serve.ts";
 import install from "./commands/install.ts";
+import vault from "./commands/vault.ts";
 
 const main = defineCommand({
   meta: {
@@ -39,6 +40,7 @@ const main = defineCommand({
     build,
     serve,
     install,
+    vault,
   },
 });
 
