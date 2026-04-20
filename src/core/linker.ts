@@ -203,6 +203,30 @@ export async function rebuildLinkGraph(
   return { linkCount };
 }
 
+/**
+ * Build a short excerpt from a markdown body.
+ * Uses the first non-empty paragraph (joined contiguous lines), capped at maxChars.
+ */
+export function buildExcerpt(body: string, maxChars = 280): string {
+  const lines = body.split("\n");
+  const buf: string[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      if (buf.length > 0) break; // end of first paragraph
+      continue; // skip leading blank lines
+    }
+    if (trimmed.startsWith("#")) {
+      if (buf.length > 0) break;
+      continue; // skip leading headings
+    }
+    buf.push(trimmed);
+  }
+  const joined = buf.join(" ").replace(/\s+/g, " ").trim();
+  if (joined.length <= maxChars) return joined;
+  return joined.slice(0, maxChars).trimEnd() + "…";
+}
+
 /** Check for cross-scope link warnings (global -> local is discouraged) */
 export function checkCrossScopeWarnings(
   parsedLinks: ParsedWikiLink[],
