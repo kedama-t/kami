@@ -20,6 +20,8 @@ import help from "./commands/help.ts";
 import batch from "./commands/batch.ts";
 import recent from "./commands/recent.ts";
 import similar from "./commands/similar.ts";
+import tag from "./commands/tag.ts";
+import move from "./commands/move.ts";
 
 export const main = defineCommand({
   meta: {
@@ -48,5 +50,7 @@ export const main = defineCommand({
     batch,
     recent,
     similar,
+    tag,
+    move,
   },
 });
