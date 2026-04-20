@@ -1,5 +1,5 @@
 import { defineCommand } from "citty";
-import { queryIndex } from "../../core/index-manager.ts";
+import { queryIndex, parseWhereClauses } from "../../core/index-manager.ts";
 import {
   resolveScope,
   getScopeRoot,
@@ -55,6 +55,12 @@ export default defineCommand({
       type: "boolean",
       description: "Filter by draft status",
     },
+    where: {
+      type: "string",
+      alias: "w",
+      description:
+        "Filter by frontmatter field: key=value or key!=value (multi: AND)",
+    },
     json: {
       type: "boolean",
       alias: "j",
@@ -78,6 +84,7 @@ export default defineCommand({
 
       const limit = parseInt(args.limit, 10);
       const offset = parseInt(args.offset, 10);
+      const where = parseWhereClauses(args.where);
 
       const { scopes, localRoot, globalRoot } = await resolveScope(
         args.scope as ScopeOption | undefined,
@@ -98,6 +105,7 @@ export default defineCommand({
           limit,
           offset,
           draft: args.draft,
+          where,
         });
 
         for (const a of articles) {

@@ -5,7 +5,10 @@ import type { ArticleMeta } from "../types/article.ts";
 import type { Scope } from "../types/scope.ts";
 import type { ScopePaths } from "../types/scope.ts";
 import { LocalStorage } from "../storage/local.ts";
-import { parseFrontmatter } from "./frontmatter.ts";
+import {
+  parseFrontmatter,
+  extractCustomFrontmatter,
+} from "./frontmatter.ts";
 import { getScopePaths, getScopeRoot, getGlobalRoot } from "./scope.ts";
 
 const storage = new LocalStorage();
@@ -125,6 +128,7 @@ export async function rebuildIndex(scopeRoot: string): Promise<MetadataIndex> {
         aliases: frontmatter.aliases,
         draft: frontmatter.draft,
         filePath,
+        custom: extractCustomFrontmatter(frontmatter),
       };
 
       index.articles[slug] = meta;
@@ -135,6 +139,79 @@ export async function rebuildIndex(scopeRoot: string): Promise<MetadataIndex> {
 
   await saveIndex(scopeRoot, index);
   return index;
+}
+
+export type WhereClause = { key: string; op: "=" | "!="; value: string };
+
+/**
+ * Parse `--where` strings like "key=value" or "key!=value" into clauses.
+ * Throws on malformed input. Empty/undefined input returns [].
+ */
+export function parseWhereClauses(
+  raw: string | string[] | undefined,
+): WhereClause[] {
+  if (!raw) return [];
+  const list = Array.isArray(raw) ? raw : [raw];
+  const out: WhereClause[] = [];
+  for (const item of list) {
+    const neIdx = item.indexOf("!=");
+    if (neIdx > 0) {
+      out.push({
+        key: item.slice(0, neIdx).trim(),
+        op: "!=",
+        value: item.slice(neIdx + 2).trim(),
+      });
+      continue;
+    }
+    const eqIdx = item.indexOf("=");
+    if (eqIdx > 0) {
+      out.push({
+        key: item.slice(0, eqIdx).trim(),
+        op: "=",
+        value: item.slice(eqIdx + 1).trim(),
+      });
+      continue;
+    }
+    throw new Error(
+      `Invalid --where expression: "${item}" (expected key=value or key!=value)`,
+    );
+  }
+  return out;
+}
+
+function metaFieldValue(meta: ArticleMeta, key: string): unknown {
+  switch (key) {
+    case "slug":
+    case "title":
+    case "folder":
+    case "created":
+    case "updated":
+    case "template":
+    case "draft":
+      return (meta as unknown as Record<string, unknown>)[key];
+    default:
+      return meta.custom?.[key];
+  }
+}
+
+function matchesWhere(meta: ArticleMeta, clauses: WhereClause[]): boolean {
+  for (const c of clauses) {
+    const raw = metaFieldValue(meta, c.key);
+    const actual = raw === undefined || raw === null ? "" : String(raw);
+    const match = actual === c.value;
+    if (c.op === "=" && !match) return false;
+    if (c.op === "!=" && match) return false;
+  }
+  return true;
+}
+
+/** Apply where clauses to a list of metas (exported so search can reuse). */
+export function filterByWhere<T extends ArticleMeta>(
+  metas: T[],
+  clauses: WhereClause[],
+): T[] {
+  if (clauses.length === 0) return metas;
+  return metas.filter((m) => matchesWhere(m, clauses));
 }
 
 /** Query the index with filters, sorting, and pagination */
@@ -148,6 +225,7 @@ export async function queryIndex(
     limit?: number;
     offset?: number;
     draft?: boolean;
+    where?: WhereClause[];
   } = {},
 ): Promise<{ articles: ArticleMeta[]; total: number }> {
   const index = await loadIndex(scopeRoot);
@@ -168,6 +246,11 @@ export async function queryIndex(
   // Filter by draft status
   if (options.draft !== undefined) {
     articles = articles.filter((a) => (a.draft ?? false) === options.draft);
+  }
+
+  // Filter by --where clauses (custom + known fields)
+  if (options.where && options.where.length > 0) {
+    articles = filterByWhere(articles, options.where);
   }
 
   const total = articles.length;

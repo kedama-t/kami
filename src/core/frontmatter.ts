@@ -131,6 +131,25 @@ export function validateFrontmatter(
   return result;
 }
 
+/**
+ * Extract custom (non-known) keys from a frontmatter object.
+ * Returns undefined if there are none, so callers can omit the field.
+ */
+export function extractCustomFrontmatter(
+  frontmatter: Frontmatter,
+): Record<string, unknown> | undefined {
+  const knownSet = new Set<string>(KNOWN_FRONTMATTER_KEYS);
+  const custom: Record<string, unknown> = {};
+  let count = 0;
+  for (const [key, value] of Object.entries(frontmatter)) {
+    if (!knownSet.has(key) && value !== undefined) {
+      custom[key] = value;
+      count++;
+    }
+  }
+  return count > 0 ? custom : undefined;
+}
+
 /** Generate frontmatter for a new article */
 export function generateFrontmatter(
   title: string,

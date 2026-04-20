@@ -16,6 +16,7 @@ import {
   serializeFrontmatter,
   generateFrontmatter,
   looseParseFrontmatter,
+  extractCustomFrontmatter,
 } from "./frontmatter.ts";
 import { editSection } from "./section.ts";
 import {
@@ -258,6 +259,7 @@ export async function createArticle(
     aliases: frontmatter.aliases,
     draft: frontmatter.draft,
     filePath,
+    custom: extractCustomFrontmatter(frontmatter),
   };
 
   return { meta, body, frontmatter, scope: targetScope };
@@ -404,6 +406,7 @@ export async function updateArticle(
     aliases: fm.aliases,
     draft: fm.draft,
     filePath: newFilePath,
+    custom: extractCustomFrontmatter(fm),
   };
 
   return { meta: updatedMeta, body, frontmatter: fm, scope: article.scope };

@@ -4,7 +4,11 @@ import type { ArticleMeta } from "../types/article.ts";
 import type { Scope } from "../types/scope.ts";
 import { LocalStorage } from "../storage/local.ts";
 import { getScopePaths } from "./scope.ts";
-import { loadIndex } from "./index-manager.ts";
+import {
+  loadIndex,
+  filterByWhere,
+  type WhereClause,
+} from "./index-manager.ts";
 import { parseFrontmatter } from "./frontmatter.ts";
 
 const storage = new LocalStorage();
@@ -152,6 +156,7 @@ export async function search(
     tags?: string[];
     folder?: string;
     limit?: number;
+    where?: WhereClause[];
   },
 ): Promise<{ results: SearchResult[]; total: number; query: string }> {
   const allResults: SearchResult[] = [];
@@ -173,6 +178,11 @@ export async function search(
 
       // Apply folder filter
       if (options.folder && meta.folder !== options.folder) continue;
+
+      // Apply --where clauses
+      if (options.where && options.where.length > 0) {
+        if (filterByWhere([meta], options.where).length === 0) continue;
+      }
 
       // Extract match snippets
       const bodyMatches: string[] = [];

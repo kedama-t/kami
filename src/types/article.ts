@@ -35,6 +35,8 @@ export interface ArticleMeta {
   aliases?: string[];
   draft?: boolean;
   filePath: string;
+  /** Custom (non-known) frontmatter keys, mirrored to enable --where filtering. */
+  custom?: Record<string, unknown>;
 }
 
 /** Full article: metadata + body + parsed frontmatter (incl. custom keys) */

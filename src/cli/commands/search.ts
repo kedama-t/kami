@@ -1,5 +1,6 @@
 import { defineCommand } from "citty";
 import { search } from "../../core/search.ts";
+import { parseWhereClauses } from "../../core/index-manager.ts";
 import { resolveScope } from "../../core/scope.ts";
 import type { ScopeOption } from "../../types/scope.ts";
 import { jsonSuccess, handleError } from "../helpers/output.ts";
@@ -37,6 +38,12 @@ export default defineCommand({
       default: "20",
       description: "Max number of results",
     },
+    where: {
+      type: "string",
+      alias: "w",
+      description:
+        "Filter by frontmatter field: key=value or key!=value (multi: AND)",
+    },
     json: {
       type: "boolean",
       alias: "j",
@@ -59,6 +66,7 @@ export default defineCommand({
         : undefined;
 
       const limit = parseInt(args.limit, 10);
+      const where = parseWhereClauses(args.where);
 
       const { scopes, localRoot, globalRoot } = await resolveScope(
         args.scope as ScopeOption,
@@ -75,6 +83,7 @@ export default defineCommand({
         tags,
         folder: args.folder,
         limit,
+        where,
       });
 
       if (args.quiet) return;
