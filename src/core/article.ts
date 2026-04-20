@@ -203,6 +203,10 @@ export async function createArticle(
     draft: options.draft,
   });
 
+  // Provenance: tag with the agent that created this article
+  const agent = process.env.KAMI_AGENT;
+  if (agent) frontmatter.created_by = agent;
+
   // Get body from template or options. If options.body has its own
   // frontmatter, parse it and merge custom (non-known) keys into ours
   // so the user can pass arbitrary metadata through.
@@ -335,8 +339,10 @@ export async function updateArticle(
     if (fm.aliases.length === 0) fm.aliases = undefined;
   }
 
-  // Update timestamp
+  // Update timestamp + provenance for the editing agent
   fm.updated = new Date().toISOString();
+  const agent = process.env.KAMI_AGENT;
+  if (agent) fm.updated_by = agent;
 
   // Apply body changes
   let body = article.body;
