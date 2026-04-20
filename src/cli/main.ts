@@ -19,6 +19,7 @@ import vault from "./commands/vault.ts";
 import help from "./commands/help.ts";
 import batch from "./commands/batch.ts";
 import recent from "./commands/recent.ts";
+import similar from "./commands/similar.ts";
 
 export const main = defineCommand({
   meta: {
@@ -46,5 +47,6 @@ export const main = defineCommand({
     help,
     batch,
     recent,
+    similar,
   },
 });
