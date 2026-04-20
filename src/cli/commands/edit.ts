@@ -52,6 +52,21 @@ export default defineCommand({
       type: "string",
       description: "Remove an alias",
     },
+    section: {
+      type: "string",
+      description:
+        "Limit edit to a heading section (exact then prefix match)",
+    },
+    replace: {
+      type: "string",
+      description:
+        "With --section: replace section body (file path or '-' for stdin)",
+    },
+    "insert-before": {
+      type: "string",
+      description:
+        "With --section: insert content above the section heading (file or '-')",
+    },
     scope: {
       type: "string",
       alias: "s",
@@ -83,14 +98,22 @@ export default defineCommand({
           : [args["remove-tag"]]
         : undefined;
 
-      // Read body/append content if file path or stdin
+      // Read body/append/section content if file path or stdin
       let bodyContent: string | undefined;
       let appendContent: string | undefined;
+      let sectionReplaceContent: string | undefined;
+      let sectionInsertBeforeContent: string | undefined;
       if (args.body) {
         bodyContent = await readBody(args.body);
       }
       if (args.append) {
         appendContent = await readBody(args.append);
+      }
+      if (args.replace) {
+        sectionReplaceContent = await readBody(args.replace);
+      }
+      if (args["insert-before"]) {
+        sectionInsertBeforeContent = await readBody(args["insert-before"]);
       }
 
       // Resolve slug and run pre-update hook
@@ -110,6 +133,9 @@ export default defineCommand({
         addAlias: args["add-alias"],
         removeAlias: args["remove-alias"],
         scope: args.scope as Scope | undefined,
+        section: args.section,
+        sectionReplace: sectionReplaceContent,
+        sectionInsertBefore: sectionInsertBeforeContent,
       });
 
       // Update index

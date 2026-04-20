@@ -72,6 +72,12 @@ export interface UpdateArticleOptions {
   addAlias?: string;
   removeAlias?: string;
   scope?: Scope;
+  /** Section heading (exact-or-prefix match) to scope edits to. */
+  section?: string;
+  /** Replace the section body when `section` is set. */
+  sectionReplace?: string;
+  /** Insert content above the section heading line. */
+  sectionInsertBefore?: string;
 }
 
 /** Options for listing articles */

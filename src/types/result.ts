@@ -9,7 +9,9 @@ export type ErrorCode =
   | "HOOK_BLOCKED"
   | "VALIDATION_ERROR"
   | "IO_ERROR"
-  | "VAULT_NOT_FOUND";
+  | "VAULT_NOT_FOUND"
+  | "SECTION_NOT_FOUND"
+  | "AMBIGUOUS_SECTION";
 
 /** Successful CLI JSON response */
 export interface SuccessResult<T = unknown> {

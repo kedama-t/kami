@@ -94,6 +94,9 @@ async function dispatch(cmd: string, args: Record<string, unknown>): Promise<unk
         addAlias: args.addAlias as string | undefined,
         removeAlias: args.removeAlias as string | undefined,
         scope: args.scope as Scope | undefined,
+        section: args.section as string | undefined,
+        sectionReplace: args.sectionReplace as string | undefined,
+        sectionInsertBefore: args.sectionInsertBefore as string | undefined,
       });
       const root = await getScopeRoot(result.scope);
       await upsertInIndex(root, result.meta);

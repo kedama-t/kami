@@ -17,6 +17,7 @@ import {
   generateFrontmatter,
   looseParseFrontmatter,
 } from "./frontmatter.ts";
+import { editSection } from "./section.ts";
 import {
   resolveScope,
   getScopePaths,
@@ -276,6 +277,37 @@ export async function updateArticle(
     );
   }
 
+  // Section editing is mutually exclusive with whole-body replace,
+  // and requires exactly one of replace / append / insert-before.
+  if (changes.section !== undefined) {
+    if (changes.body !== undefined) {
+      throw new KamiError(
+        "Cannot specify both --section and --body",
+        "VALIDATION_ERROR",
+        EXIT_CODES.GENERAL_ERROR,
+      );
+    }
+    const ops = [
+      changes.sectionReplace,
+      changes.append,
+      changes.sectionInsertBefore,
+    ].filter((v) => v !== undefined);
+    if (ops.length === 0) {
+      throw new KamiError(
+        "--section requires one of --replace, --append, or --insert-before",
+        "VALIDATION_ERROR",
+        EXIT_CODES.GENERAL_ERROR,
+      );
+    }
+    if (ops.length > 1) {
+      throw new KamiError(
+        "--section accepts only one of --replace, --append, --insert-before",
+        "VALIDATION_ERROR",
+        EXIT_CODES.GENERAL_ERROR,
+      );
+    }
+  }
+
   const article = await readArticle(slug, changes.scope, cwd);
 
   // Start from the parsed frontmatter so any custom (non-known) keys
@@ -306,7 +338,24 @@ export async function updateArticle(
 
   // Apply body changes
   let body = article.body;
-  if (changes.body !== undefined) {
+  if (changes.section !== undefined) {
+    if (changes.sectionReplace !== undefined) {
+      body = editSection(body, changes.section, {
+        kind: "replace",
+        content: changes.sectionReplace,
+      });
+    } else if (changes.append !== undefined) {
+      body = editSection(body, changes.section, {
+        kind: "append",
+        content: changes.append,
+      });
+    } else if (changes.sectionInsertBefore !== undefined) {
+      body = editSection(body, changes.section, {
+        kind: "insertBefore",
+        content: changes.sectionInsertBefore,
+      });
+    }
+  } else if (changes.body !== undefined) {
     body = changes.body;
   } else if (changes.append !== undefined) {
     body = body ? `${body}\n\n${changes.append}` : changes.append;
