@@ -1,6 +1,17 @@
 import type { Scope } from "./scope.ts";
 
-/** Frontmatter fields of an article */
+/** Known frontmatter fields that kami manages explicitly */
+export const KNOWN_FRONTMATTER_KEYS = [
+  "title",
+  "tags",
+  "created",
+  "updated",
+  "template",
+  "aliases",
+  "draft",
+] as const;
+
+/** Frontmatter fields of an article (custom keys are passed through) */
 export interface Frontmatter {
   title: string;
   tags: string[];
@@ -9,6 +20,7 @@ export interface Frontmatter {
   template?: string;
   aliases?: string[];
   draft?: boolean;
+  [key: string]: unknown;
 }
 
 /** Metadata stored in index.json (frontmatter + location) */
@@ -25,10 +37,11 @@ export interface ArticleMeta {
   filePath: string;
 }
 
-/** Full article: metadata + body */
+/** Full article: metadata + body + parsed frontmatter (incl. custom keys) */
 export interface Article {
   meta: ArticleMeta;
   body: string;
+  frontmatter: Frontmatter;
 }
 
 /** Article with scope information */

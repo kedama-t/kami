@@ -1,5 +1,6 @@
 import matter from "gray-matter";
 import type { Frontmatter } from "../types/article.ts";
+import { KNOWN_FRONTMATTER_KEYS } from "../types/article.ts";
 import { KamiError, EXIT_CODES } from "../types/result.ts";
 
 /**
@@ -14,6 +15,25 @@ const yamlEngine = {
   stringify: (obj: object) =>
     jsYaml.dump(obj, { lineWidth: -1, schema: jsYaml.CORE_SCHEMA }),
 };
+
+/**
+ * Loosely parse frontmatter without enforcing the kami schema.
+ * Returns the raw key-value map (or empty object) plus the body.
+ * Returns null if no frontmatter delimiter is present.
+ */
+export function looseParseFrontmatter(
+  content: string,
+): { frontmatter: Record<string, unknown>; body: string } | null {
+  if (!content.startsWith("---")) return null;
+  try {
+    const { data, content: body } = matter(content, {
+      engines: { yaml: yamlEngine },
+    });
+    return { frontmatter: data ?? {}, body: body.trim() };
+  } catch {
+    return null;
+  }
+}
 
 /** Parse a Markdown string into frontmatter and body */
 export function parseFrontmatter(content: string): {
@@ -53,6 +73,16 @@ export function serializeFrontmatter(
     fm.aliases = frontmatter.aliases;
   if (frontmatter.draft) fm.draft = frontmatter.draft;
 
+  // Custom (unknown) keys: alphabetical order for deterministic output
+  const knownSet = new Set<string>(KNOWN_FRONTMATTER_KEYS);
+  const customKeys = Object.keys(frontmatter)
+    .filter((k) => !knownSet.has(k))
+    .sort();
+  for (const key of customKeys) {
+    const value = frontmatter[key];
+    if (value !== undefined) fm[key] = value;
+  }
+
   return matter.stringify(body ? `\n${body}\n` : "\n", fm);
 }
 
@@ -82,7 +112,7 @@ export function validateFrontmatter(
     return now;
   };
 
-  return {
+  const result: Frontmatter = {
     title: data.title,
     tags,
     created: toISOString(data.created),
@@ -91,6 +121,14 @@ export function validateFrontmatter(
     aliases: Array.isArray(data.aliases) ? data.aliases.map(String) : undefined,
     draft: typeof data.draft === "boolean" ? data.draft : undefined,
   };
+
+  // Preserve unknown (custom) keys verbatim
+  const knownSet = new Set<string>(KNOWN_FRONTMATTER_KEYS);
+  for (const [key, value] of Object.entries(data)) {
+    if (!knownSet.has(key)) result[key] = value;
+  }
+
+  return result;
 }
 
 /** Generate frontmatter for a new article */

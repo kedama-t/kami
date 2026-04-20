@@ -7,6 +7,7 @@ import type {
   UpdateArticleOptions,
   Frontmatter,
 } from "../types/article.ts";
+import { KNOWN_FRONTMATTER_KEYS } from "../types/article.ts";
 import type { Scope } from "../types/scope.ts";
 import { KamiError, EXIT_CODES } from "../types/result.ts";
 import { LocalStorage } from "../storage/local.ts";
@@ -14,6 +15,7 @@ import {
   parseFrontmatter,
   serializeFrontmatter,
   generateFrontmatter,
+  looseParseFrontmatter,
 } from "./frontmatter.ts";
 import {
   resolveScope,
@@ -37,6 +39,18 @@ const INVALID_CHARS = /[/\\:*?"<>|]/g;
 /** Sanitize a title to create a valid slug */
 export function titleToSlug(title: string): string {
   return title.trim().replace(INVALID_CHARS, "-");
+}
+
+/**
+ * Loosely extract YAML frontmatter from a body string without enforcing
+ * known-field schema. Used to harvest custom metadata from CLI-supplied bodies.
+ * Returns parsed frontmatter object (may be empty) + remaining body, or null
+ * if no frontmatter delimiter is present.
+ */
+function tryParseBodyFrontmatter(
+  raw: string,
+): { frontmatter: Record<string, unknown>; body: string } | null {
+  return looseParseFrontmatter(raw);
 }
 
 /** Resolve a slug to a file path and scope, searching across scopes */
@@ -142,6 +156,7 @@ export async function readArticle(
       draft: frontmatter.draft,
     },
     body,
+    frontmatter,
     scope: resolved.scope,
   };
 }
@@ -186,10 +201,23 @@ export async function createArticle(
     draft: options.draft,
   });
 
-  // Get body from template or options
+  // Get body from template or options. If options.body has its own
+  // frontmatter, parse it and merge custom (non-known) keys into ours
+  // so the user can pass arbitrary metadata through.
   let body = "";
   if (options.body) {
-    body = options.body;
+    const parsed = tryParseBodyFrontmatter(options.body);
+    if (parsed) {
+      body = parsed.body;
+      const knownSet = new Set<string>(KNOWN_FRONTMATTER_KEYS);
+      for (const [key, value] of Object.entries(parsed.frontmatter)) {
+        if (!knownSet.has(key) && value !== undefined) {
+          frontmatter[key] = value;
+        }
+      }
+    } else {
+      body = options.body;
+    }
   } else {
     // Try to load and expand template
     const templateName = options.template ?? "note";
@@ -231,7 +259,7 @@ export async function createArticle(
     filePath,
   };
 
-  return { meta, body, scope: targetScope };
+  return { meta, body, frontmatter, scope: targetScope };
 }
 
 /** Update an existing article */
@@ -250,8 +278,9 @@ export async function updateArticle(
 
   const article = await readArticle(slug, changes.scope, cwd);
 
-  // Apply metadata changes
-  const fm: Frontmatter = { ...article.meta };
+  // Start from the parsed frontmatter so any custom (non-known) keys
+  // present in the source file are preserved through the round-trip.
+  const fm: Frontmatter = { ...article.frontmatter };
 
   if (changes.title !== undefined) fm.title = changes.title;
 
@@ -328,7 +357,7 @@ export async function updateArticle(
     filePath: newFilePath,
   };
 
-  return { meta: updatedMeta, body, scope: article.scope };
+  return { meta: updatedMeta, body, frontmatter: fm, scope: article.scope };
 }
 
 /** Delete an article */

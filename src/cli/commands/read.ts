@@ -46,6 +46,13 @@ export default defineCommand({
       );
 
       if (args.json) {
+        // Surface the full parsed frontmatter (incl. custom keys), with
+        // explicit defaults for known optional fields for output stability.
+        const fmOut: Record<string, unknown> = {
+          ...article.frontmatter,
+          aliases: article.frontmatter.aliases ?? [],
+          draft: article.frontmatter.draft ?? false,
+        };
         console.log(
           jsonSuccess({
             slug: article.meta.slug,
@@ -53,15 +60,7 @@ export default defineCommand({
             scope: article.scope,
             folder: article.meta.folder,
             file_path: article.meta.filePath,
-            frontmatter: {
-              title: article.meta.title,
-              tags: article.meta.tags,
-              created: article.meta.created,
-              updated: article.meta.updated,
-              template: article.meta.template,
-              aliases: article.meta.aliases ?? [],
-              draft: article.meta.draft ?? false,
-            },
+            frontmatter: fmOut,
             body: article.body,
           }),
         );
@@ -89,17 +88,8 @@ export default defineCommand({
         return;
       }
 
-      // Default: full markdown with frontmatter
-      const fm = {
-        title: article.meta.title,
-        tags: article.meta.tags,
-        created: article.meta.created,
-        updated: article.meta.updated,
-        template: article.meta.template,
-        aliases: article.meta.aliases,
-        draft: article.meta.draft,
-      };
-      console.log(serializeFrontmatter(fm, article.body).trim());
+      // Default: full markdown with frontmatter (preserves custom keys)
+      console.log(serializeFrontmatter(article.frontmatter, article.body).trim());
     } catch (err) {
       handleError(err, args.json);
     }
