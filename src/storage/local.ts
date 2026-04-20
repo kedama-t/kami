@@ -1,5 +1,6 @@
-import { readdir, mkdir, unlink, stat } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { mkdir, unlink, stat, writeFile, rename } from "node:fs/promises";
+import { basename, dirname, join } from "node:path";
+import { randomUUID } from "node:crypto";
 import type { StorageAdapter } from "./adapter.ts";
 
 /** Local filesystem storage adapter */
@@ -8,8 +9,24 @@ export class LocalStorage implements StorageAdapter {
     return Bun.file(path).text();
   }
 
+  /**
+   * tempfile を同一ディレクトリに作成して rename で置換。
+   * 並行書き込み時の partial-write による破損を防ぐ（lost-update は許容）。
+   */
   async writeFile(path: string, content: string): Promise<void> {
-    await Bun.write(path, content);
+    const dir = dirname(path);
+    await mkdir(dir, { recursive: true });
+    const tmpPath = join(
+      dir,
+      `.${basename(path)}.tmp.${process.pid}.${randomUUID()}`,
+    );
+    try {
+      await writeFile(tmpPath, content);
+      await rename(tmpPath, path);
+    } catch (err) {
+      await unlink(tmpPath).catch(() => {});
+      throw err;
+    }
   }
 
   async deleteFile(path: string): Promise<void> {
